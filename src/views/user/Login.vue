@@ -7,13 +7,13 @@
         </div>
       </template>
       <el-form >
-        <el-form-item label="用户名" prop="name" style="margin-left: 15px">
-          <el-input  type="text" />
+        <el-form-item label="用户名" prop="userAccount"  style="margin-left: 15px">
+          <el-input v-model="userModel.userAccount" type="text" />
         </el-form-item>
-        <el-form-item label="密码" prop="pass" style="margin-left: 28px">
-          <el-input  type="password"  />
+        <el-form-item label="密码" prop="userPassword"  style="margin-left: 28px">
+          <el-input v-model="userModel.userPassword" type="password"  />
         </el-form-item>
-        <el-button type="primary"style="width: 250px;">登录</el-button>
+        <el-button type="primary"style="width: 250px;" @click="login">登录</el-button>
       </el-form>
       <el-divider />
       <el-button type="info" plain 
@@ -23,13 +23,31 @@
 </template>
 
 <script lang="ts" setup>
+import axios from 'axios';
+import { ElMessage } from 'element-plus';
+import { reactive} from 'vue';
+const userModel = reactive({
+  userAccount: '',
+  userPassword: '',
+});
 
-
+async function login() {
+  let res = await axios.post('http://127.0.0.1:8080/user/login', {
+    userAccount: userModel.userAccount,
+    userPassword: userModel.userPassword
+  })
+  if (res.status == 200) {
+    ElMessage.success('登录成功')
+  } else {
+    
+  }
+}
 
 
 </script>
 
 <style scoped>
+
 .login {
   text-align: center;
   margin: 0 auto;

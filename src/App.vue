@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Header from './components/Header.vue';
+import 'element-plus/es/components/message/style/css' // ElMessage
 
 
 </script>
@@ -68,7 +69,12 @@ body {
   font-weight: bolder;
   color: #3f3f3f;
 }
-
+.el-message {
+  position: fixed !important;
+  top: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
 .rlink {
   text-decoration: none;
   font-weight: 500;

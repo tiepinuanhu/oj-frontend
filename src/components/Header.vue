@@ -25,7 +25,7 @@
             </el-icon>
             提交记录
         </el-menu-item>
-        <el-menu-item index="/login">
+        <el-menu-item index="/user/login">
             <el-icon>
                 <User />
             </el-icon>
