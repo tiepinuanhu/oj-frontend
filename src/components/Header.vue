@@ -1,5 +1,5 @@
 <template>
-    <el-menu mode="horizontal" :default-active="currentPath" :router="true" background-color="#67C23A">
+    <el-menu mode="horizontal" :default-active="currentPath" :router="true">
         <img src="@/assets/cf-icon.png" class="icon">
         <el-menu-item index="/">
             <el-icon>
@@ -25,13 +25,13 @@
             </el-icon>
             提交记录
         </el-menu-item>
-        <el-menu-item index="/user/login">
+        <el-menu-item index="/login">
             <el-icon>
                 <User />
             </el-icon>
             登录
         </el-menu-item>
-        <el-menu-item index="/user/reg">
+        <el-menu-item index="/user/register">
             <el-icon>
                 <CircleCheck />
             </el-icon>
@@ -56,7 +56,7 @@ onMounted(() => {
 </script>
 
 <style lang="css" scoped>
-/* .icon {
+.icon {
   border-radius: 1px;
   margin-left: 0;
   width: 180px;
@@ -78,5 +78,5 @@ onMounted(() => {
 
 .el-menu {
   justify-content: center;
-} */
+}
 </style>
