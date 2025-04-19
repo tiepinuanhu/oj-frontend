@@ -1,5 +1,5 @@
 <template>
-    <el-menu mode="horizontal" :default-active="currentPath" :router="true">
+    <el-menu mode="horizontal" :default-active="currentPath" router="true">
         <img src="@/assets/cf-icon.png" class="icon">
         <el-menu-item index="/">
             <el-icon>
