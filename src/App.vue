@@ -2,7 +2,21 @@
 import Header from '@/components/Header.vue';
 import 'element-plus/es/components/message/style/css' // ElMessage
 import { onMounted } from 'vue';
-
+import instance from '@/utils/request';
+// onMounted(() => {
+//   // 获取当前登录用户
+  
+//   let res = instance({
+//     url: '/user/login',
+//     method: 'post',
+//     data: {
+//       userAccount: 'wxc',
+//       userPassword: 'wxc123...'
+//     }
+//   })
+//   ElMessage.success(JSON.stringify(res))
+//   console.log(res)
+// })
 </script>
 
 <template>

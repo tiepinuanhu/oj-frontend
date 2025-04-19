@@ -7,4 +7,5 @@
 export {}
 declare global {
   const ElMes: typeof import('element-plus/es')['ElMes']
+  const ElMessage: typeof import('element-plus/es')['ElMessage']
 }

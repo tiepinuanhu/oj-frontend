@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts" setup>
-import axios from 'axios';
+import instance from '../../utils/request';
 import { ElMessage } from 'element-plus';
 import { reactive} from 'vue';
 import { useRouter } from 'vue-router';
@@ -37,18 +37,26 @@ const userStore = useUserStore();
 
 
 async function login() {
-  let res = await axios.post('http://127.0.0.1:8080/user/login', {
-    userAccount: userModel.userAccount,
-    userPassword: userModel.userPassword
+  const res = await instance({
+    url: 'user/login',
+    method: 'post',
+    data: {
+      userAccount: userModel.userAccount,
+      userPassword: userModel.userPassword
+    }
   })
-  if (res.status == 200) {
-    ElMessage.success('登录成功')
+  if (res.code === 200) {
+      ElMessage.success({
+      type: 'success',
+      message: JSON.stringify(res.data),
+      duration: 2000,
+    })
     router.push({
       path: "/",
       replace: true,
     });
   } else {
-    
+    ElMessage.warning("dasdas")
   }
 }
 

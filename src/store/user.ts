@@ -1,10 +1,9 @@
-import { id } from "element-plus/es/locales.mjs";
 import { defineStore } from "pinia";
 
 export const useUserStore = defineStore("user", {
   state: () => {
     return {
-      username: 'jack',
+      username: '',
       id: 0,
       avatar:'https://i.ibb.co/XYFRqbD/grezman.jpg',
       token: '1234567890',

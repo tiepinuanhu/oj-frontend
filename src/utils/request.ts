@@ -1,7 +1,21 @@
 import axios from "axios";
+import { baseURL } from "./config";
 
-let instance = axios.create({
-  baseURL: "http://127.0.0.1:8080/",
-  timeout: 1000,
-  headers: { "X-Custom-Header": "foobar" }
+const instance = axios.create({
+  baseURL: baseURL,
+  timeout: 2000,
 });
+
+instance.interceptors.request.use((config) => {
+    return config
+}
+)
+instance.interceptors.response.use(
+    (response) => {
+        return response.data
+    },
+    (error) => {
+        return Promise.reject(error)
+    }
+)
+export default instance
