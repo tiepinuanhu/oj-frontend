@@ -1,5 +1,5 @@
 <template>
-    <el-menu mode="horizontal" :default-active="currentPath" :router="true">
+    <el-menu mode="horizontal" :default-active="currentPath" :router="true" background-color="#67C23A">
         <img src="@/assets/cf-icon.png" class="icon">
         <el-menu-item index="/">
             <el-icon>
@@ -56,7 +56,7 @@ onMounted(() => {
 </script>
 
 <style lang="css" scoped>
-.icon {
+/* .icon {
   border-radius: 1px;
   margin-left: 0;
   width: 180px;
@@ -78,5 +78,5 @@ onMounted(() => {
 
 .el-menu {
   justify-content: center;
-}
+} */
 </style>
