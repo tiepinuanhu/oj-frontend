@@ -11,6 +11,11 @@ export const routes = [
     name: "hello",
     component: () => import("@/components/HelloWorld.vue"),
   },
+  {
+    path: "/problem",
+    name: "problem",
+    component: () => import("@/views/problem/Problem.vue"),
+  },
 ]
 
 const router = createRouter({
