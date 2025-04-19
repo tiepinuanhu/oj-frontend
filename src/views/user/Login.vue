@@ -27,13 +27,15 @@ import axios from 'axios';
 import { ElMessage } from 'element-plus';
 import { reactive} from 'vue';
 import { useRouter } from 'vue-router';
-import { useUserStore } from '@/store/user';
+import { useUserStore } from '../../store/user';
 const userModel = reactive({
   userAccount: '',
   userPassword: '',
 });
 const router = useRouter();
 const userStore = useUserStore();
+
+
 async function login() {
   let res = await axios.post('http://127.0.0.1:8080/user/login', {
     userAccount: userModel.userAccount,

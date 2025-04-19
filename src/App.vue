@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Header from '@/components/Header.vue';
 import 'element-plus/es/components/message/style/css' // ElMessage
-
+import { onMounted } from 'vue';
 
 </script>
 

@@ -12,7 +12,6 @@
     "@types/node": "^22.14.1",
     "axios": "^1.8.4",
     "element-plus": "^2.9.7",
-    "pinia": "^3.0.2",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
@@ -21,6 +20,7 @@
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/tsconfig": "^0.7.0",
     "openapi-typescript-codegen": "^0.29.0",
+    "pinia": "^3.0.2",
     "typescript": "~5.7.2",
     "unplugin-auto-import": "^19.1.2",
     "unplugin-vue-components": "^28.5.0",
