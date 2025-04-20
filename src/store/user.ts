@@ -1,20 +1,31 @@
 import { defineStore } from "pinia";
+import {ref} from "vue"
+import instance from "../utils/request";
+export const useUserStore = defineStore("user", () => {
 
-export const useUserStore = defineStore("user", {
-  state: () => {
-    return {
-      username: '',
-      id: 0,
-      avatar:'https://i.ibb.co/XYFRqbD/grezman.jpg',
-      token: '1234567890',
-    };
-  },
-  actions: {
-    setUsername(username: string) {
-      this.username = username;
-    },
-  },
-  getters: {
+  const userInfo = ref({
+    token: localStorage.getItem("token") || "",
+  })
 
-  },
+  
+
+  async function setToken(token: string) {
+    instance.defaults.headers.common["Authorization"] = `Bearer ${token}`
+    localStorage.setItem("token", token)
+  }
+
+  async function getToken() {
+    const token = localStorage.getItem("token")
+    if (token) {
+      setToken(token)
+      return true
+    }
+    return false
+  }
+
+  async function logout() {
+    instance.defaults.headers.common["Authorization"] = ""
+    localStorage.removeItem("token")
+  }
+  return {setToken, getToken,logout}
 })

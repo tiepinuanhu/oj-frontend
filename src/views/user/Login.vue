@@ -8,10 +8,10 @@
       </template>
       <el-form >
         <el-form-item label="用户名" prop="userAccount"  style="margin-left: 15px">
-          <el-input v-model="userModel.userAccount" type="text" />
+          <el-input v-model="form.userAccount" type="text" />
         </el-form-item>
         <el-form-item label="密码" prop="userPassword"  style="margin-left: 28px">
-          <el-input v-model="userModel.userPassword" type="password"  />
+          <el-input v-model="form.userPassword" type="password"  />
         </el-form-item>
         <el-button type="primary"style="width: 250px;" @click="login">登录</el-button>
       </el-form>
@@ -23,34 +23,32 @@
 </template>
 
 <script lang="ts" setup>
-import instance from '../../utils/request';
 import { ElMessage } from 'element-plus';
 import { reactive} from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../../store/user';
-const userModel = reactive({
-  userAccount: '',
-  userPassword: '',
+import instance from '../../utils/request';
+import { userLogin } from '../../api/user';
+
+const form = reactive({
+  userAccount: "",
+  userPassword: "",
 });
+
 const router = useRouter();
 const userStore = useUserStore();
 
 
 async function login() {
-  const res = await instance({
-    url: 'user/login',
-    method: 'post',
-    data: {
-      userAccount: userModel.userAccount,
-      userPassword: userModel.userPassword
-    }
-  })
+  const res = await userLogin(form)
+  // 登陆成功后：跳转到首页，存储token到LocalStorage
   if (res.code === 200) {
       ElMessage.success({
       type: 'success',
       message: JSON.stringify(res.data),
       duration: 2000,
     })
+    userStore.setToken(res.data?.token);
     router.push({
       path: "/",
       replace: true,
