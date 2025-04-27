@@ -27,8 +27,8 @@ import { ElMessage } from 'element-plus';
 import { reactive} from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../../store/user';
-import instance from '../../utils/request';
 import { userLogin } from '../../api/user';
+import useStore from 'element-plus/es/components/table/src/store/index.mjs';
 
 const form = reactive({
   userAccount: "",
@@ -38,7 +38,10 @@ const form = reactive({
 const router = useRouter();
 const userStore = useUserStore();
 
-
+/**
+ * 登录方法
+ * 登录成功后将后端返回的token保存到pinia和localStorage中
+ */
 async function login() {
   const res = await userLogin(form)
   // 登陆成功后：跳转到首页，存储token到LocalStorage
@@ -46,9 +49,10 @@ async function login() {
       ElMessage.success({
       type: 'success',
       message: JSON.stringify(res.data),
-      duration: 2000,
+      duration: 1000,
     })
-    userStore.setToken(res.data?.token);
+    userStore.user.userName = res.data.userName
+    userStore.user.userAvatar = res.data.userAvatar
     router.push({
       path: "/",
       replace: true,

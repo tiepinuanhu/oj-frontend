@@ -1,9 +1,10 @@
-import instance from "../../utils/request";
+import instance from "../../axios/request";
+import type { LoginParams } from "./type";
 
 
 
 
-export const userLogin = (data: any) => {
+export const userLogin = (data: LoginParams) => {
   return instance({
     url: "/user/login",
     method: "post",

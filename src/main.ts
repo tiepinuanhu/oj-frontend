@@ -4,10 +4,11 @@ import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 import router from './router'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 const app = createApp(App)
 
 const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
 
 app.use(router)

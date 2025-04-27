@@ -7,7 +7,7 @@
             </el-icon>
             首页
         </el-menu-item>
-        <el-menu-item index="/problem">
+        <el-menu-item index="/problems">
             <el-icon>
                 <Files />
             </el-icon>
@@ -26,22 +26,22 @@
             提交记录
         </el-menu-item>
         <!-- 用户未登录时，才显示登录和注册菜单项 -->
-        <el-menu-item index="/user/login" v-if="!userStore.username" >
+        <el-menu-item index="/user/login" v-if="!userStore.token" >
             <el-icon>
                 <User />
             </el-icon>
             登录
         </el-menu-item>
-        <el-menu-item index="/user/register" v-if="!userStore.username">
+        <el-menu-item index="/user/register" v-if="!userStore.token">
             <el-icon>
                 <CircleCheck />
             </el-icon>
             注册
         </el-menu-item>
-        <el-sub-menu index="/user" v-if="userStore.username">
+        <el-sub-menu index="/user" v-if="userStore.token">
       <template #title>
-        <el-avatar :size="35" :src="userStore.avatar"/>
-        <span style="padding-left: 8px;"> {{ userStore.username }} </span>
+        <el-avatar :size="35" :src="userStore.user.userAvatar"/>
+        <span style="padding-left: 8px;"> {{ userStore.user.userName }} </span>
       </template>
       <el-menu-item >
         <el-icon>
@@ -78,12 +78,12 @@ const userStore = useUserStore()
 
 let currentPath = ref('')
 onMounted(() => {
-    let route = useRoute()
+    const route = useRoute()
     currentPath.value = route.path
 })
 
 const logout = () => {
-    
+    userStore.logout()
 }
 
 </script>
