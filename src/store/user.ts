@@ -10,6 +10,7 @@ export const useUserStore = defineStore("user", () => {
     userAccount: "",
     userName: "",
     userAvatar: "",
+    userRole: 0,
   })
   const token = ref("")
   const tagVisible = ref(true)

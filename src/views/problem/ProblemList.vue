@@ -10,14 +10,27 @@
            v-model:current-page="current" v-model:page-size="pageSize"
             layout="prev, pager, next, jumper" :total="total">
           </el-pagination>
-
           <el-button-group>
-            <el-button type="primary" @click="loadData()">
-              <el-icon class="el-icon--left">
-                <Refresh />
-              </el-icon>
-              刷新
-            </el-button>
+            <span>
+              <el-popconfirm v-if="userStore.user.userRole >= 1" confirm-button-text="确认"
+              cancel-button-text="取消" title="确认添加题目?"
+                @confirm="">
+                <template #reference>
+                  <el-button type="success">
+                    <el-icon class="el-icon--left">
+                      <Plus />
+                    </el-icon>
+                    添加题目
+                  </el-button>
+                </template>
+              </el-popconfirm>
+              <el-button type="primary" @click="loadData()">
+                <el-icon class="el-icon--left">
+                  <Refresh />
+                </el-icon>
+                刷新
+              </el-button>
+            </span>
           </el-button-group>
         </div>
       </template>
@@ -40,14 +53,17 @@
           <el-form-item>
             <el-select v-model="searchParams.tags" multiple filterable clearable placeholder="题目标签" style="width: 300px;"
               @change="loadData">
-              <el-option v-for="tag in tagList" :key="tag" :label="tag" :value="tag">
-                <el-tag v-show="tagVisible" type="info" :color="getTagColor(tag)">
-                  <span class="tag-text">{{ tag }} </span>
+              <el-option v-for="tag in tagList" :key="tag.id" :label="tag.name" :value="tag.name">
+                <el-tag v-show="tagVisible" type="info" :color="tag.color">
+                  <span class="tag-text">{{ tag.name }} </span>
                 </el-tag>
               </el-option>
             </el-select>
           </el-form-item>
         </el-form>
+        <el-button type="success" @click="clear">
+            显示全部
+          </el-button>
       </div>
 
       <!-- 😍😍😍😍数据表格😍😍😍😍 -->
@@ -120,44 +136,55 @@ import type { ProblemQueryRequest, ProblemVO } from '../../api/problem/types';
 import { ElMessage } from 'element-plus';
 import { getAllTags, type Tag } from '../../api/tag';
 import { useUserStore } from '../../store/user';
-import { RouterLink } from 'vue-router'
+import { RouterLink } from 'vue-router';
+import qs from 'qs';
+import { useRoute } from 'vue-router';
+/**
+ * 组件数据
+ */
 const problems = ref<ProblemVO[]>([])
 const total = ref(0);
 const current = ref(1);
 const pageSize = ref(12);
 const tagVisible = ref(true);
 const finished = ref(false);
-const tagList = ref([]);
+const tagList = ref<Tag[]>([]);
 const searchParams = reactive<ProblemQueryRequest>({
-  pageSize: 12,
-  current: 1,
   id:  undefined,
   title: undefined,
   tags: undefined,
   userId: undefined,
   level: undefined
 });
-const tagColorList =  [
-  '#2d8cf0',
-  '#3f51b5',
-  '#9c27b0',
-  '#009688',
-  '#19be6b',
-  '#689f38',
-  '#ff9900',
-  '#E91E63',
-  '#ed4014'
-]
-
+const route = useRoute();
+/**
+ * 请求后端题目数据
+ * URL路径参数展示页号，修改url可以实现换页
+ */
 async function loadData() {
   finished.value = false;
-  let url = location.pathname;
-  if (current.value > 1) {
-    searchParams.current = current;
-  }
-  const res = await listProblemVOByPage(
-    searchParams
-  );
+  
+  const param: Record<string, any> = {};
+  if (searchParams.title) param.title = searchParams.title;
+  if (searchParams.level !== null && searchParams.level !== undefined) param.level = searchParams.level;
+  if (searchParams.tags && searchParams.tags.length > 0) param.tags = searchParams.tags;
+  param.current = current.value;
+
+  const qsStr = qs.stringify(param); // 使用 qs 库拼接查询参数
+  const url = `${route.path}?${qsStr}`;
+  history.replaceState(history.state, null, url);
+
+
+
+
+  /**
+   * 💕💕💕...是展开语法
+   */
+  const res = await listProblemVOByPage({
+    ...searchParams,
+    current: current.value,
+    pageSize: pageSize.value
+  });
   if (res.code === 200) {
     // ElMessage.success('success to load data')
 
@@ -168,15 +195,7 @@ async function loadData() {
     ElMessage.warning('failed to load data')
   }
 }
-const hash = (str : string) => {
-  let t = 0;
-  for (let i = 0; i < str.length; i++)
-    t = 31 * t + str.charCodeAt(i);
-  return t;
-}
-const getTagColor = (tag : string) => {
-  return tagColorList[hash(tag) % tagColorList.length];
-}
+
 
 const handleCurrentChange = (val: number) => {
   searchParams.current = val;
@@ -189,6 +208,14 @@ const switchTag = () => {
 };
 const cellStyle = (columnIndex ) => {
   return { textAlign: columnIndex === 1 ? 'left' : 'center' };
+};
+const clear = () => {
+  searchParams.id = undefined;
+  searchParams.title = undefined;
+  searchParams.tags = undefined;
+  searchParams.userId = undefined;
+  searchParams.level = undefined;
+  loadData();
 };
 async function loadTags() {
   const res = await getAllTags();
@@ -205,6 +232,11 @@ onMounted(() => {
     tagVisible.value = userStore.tagVisible === true;
   }
   loadTags();
+  const query = route.query;
+  if (query.current) {
+    current.value = parseInt(query.current as string);
+    searchParams.current = current.value;
+  }
   loadData();
 });
 

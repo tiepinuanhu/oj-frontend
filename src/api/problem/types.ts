@@ -20,7 +20,7 @@ export interface PageRequest {
 export interface ProblemQueryRequest extends PageRequest {
     id?: number;
     title?: string;
-    tags?: string[];
+    tags?: Tag[];
     userId?: number;
     level?: number;
 }
@@ -29,7 +29,7 @@ export interface ProblemVO {
     id?: number;
     title?: string;
     content?: string;
-    tags?: string[];
+    tags?: Tag[];
     level?: string;
     submittedNum?: number;
     acceptedNum?: number;

@@ -53,6 +53,7 @@ async function login() {
     })
     userStore.user.userName = res.data.userName
     userStore.user.userAvatar = res.data.userAvatar
+    userStore.user.userRole = res.data.userRole
     router.push({
       path: "/",
       replace: true,
