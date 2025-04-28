@@ -25,20 +25,11 @@
 
       <!-- 😍😍😍😍😍筛选搜索😍😍😍😍😍😍 -->
       <div style="display: inline-flex;">
-        <el-form :inline="true" :model="searchParams">
-          <!-- <el-form-item>
-            <el-input v-model="id" type="text" placeholder="pid跳转" style="width: 70px;"
-              @keyup.enter="this.$router.push('/problem/' + pid)" />
-          </el-form-item> -->
+        <el-form :inline="true" :model="searchParams" >
           <el-form-item>
-            <el-input v-model="searchParams.title" type="text" placeholder="题目标题或内容" style="width: 140px;" @keyup.enter="loadData" />
+            <el-input v-model="searchParams.title" type="text" placeholder="题目标题或内容" 
+            style="width: 280px;" @keyup.enter="loadData" />
           </el-form-item>
-          <!-- <el-form-item>
-            <el-select v-model="filter.publisherUid" filterable clearable placeholder="出题人" style="width: 160px;"
-              @change="all">
-              <el-option v-for="p in publisherList" :key="p.publisher" :label="p.name" :value="p.publisher" />
-            </el-select>
-          </el-form-item> -->
           <el-form-item>
             <el-select v-model="searchParams.level" placeholder="难度评级" 
             style="width: 120px;" @change="loadData">
@@ -49,51 +40,21 @@
           <el-form-item>
             <el-select v-model="searchParams.tags" multiple filterable clearable placeholder="题目标签" style="width: 300px;"
               @change="loadData">
-              <el-option v-for="tag in searchParams.tags" :key="tag" :label="tag" :value="tag">
-                <el-tag type="info" :color="tag.color">
+              <el-option v-for="tag in tagList" :key="tag" :label="tag" :value="tag">
+                <el-tag v-show="tagVisible" type="info" :color="getTagColor(tag)">
                   <span class="tag-text">{{ tag }} </span>
                 </el-tag>
               </el-option>
             </el-select>
           </el-form-item>
         </el-form>
-        <!-- <el-button-group>
-          <el-button type="primary" @click="all">
-            筛选记录
-          </el-button>
-          <el-button type="success" @click="clear">
-            显示全部
-          </el-button>
-        </el-button-group> -->
       </div>
 
       <!-- 😍😍😍😍数据表格😍😍😍😍 -->
-      <el-table :data="problems" height="600px" :header-cell-style="{ textAlign: 'center' }" :cell-style="cellStyle">
+      <el-table :data="problems" height="535px" :header-cell-style="{ textAlign: 'center' }"
+       :cell-style="cellStyle" v-loading="!finished">
         <el-table-column prop="id" label="#" width="100px" />
         <el-table-column prop="title" width="auto" label="标题">
-          <template #default="scope">
-            <!-- <div class="title-container">
-              <div class="title-left">
-                <router-link class="rlink" :to="'/problem/' + scope.row.id">
-                  {{ scope.row.title }}
-                </router-link>
-                </div>
-              </div> -->
-              <router-link class="rlink" :to="'/problem/' + scope.row.id">
-                  {{ scope.row.title }}
-              </router-link>
-            </template>
-        </el-table-column>
-        <el-table-column prop="tags" width="auto" label="标签">
-          <template #default="scope">
-              <el-tag>
-                <span v-for="tag in scope.row.tags" :key="tag"  :color="tag.color">
-                  {{ tag }}
-                </span>
-              </el-tag>
-            </template>
-        </el-table-column>
-        <!-- <el-table-column prop="title" width="auto">
           <template #header>
             <div class="title-container">
               <div class="title-left">标题</div>
@@ -113,19 +74,24 @@
                 <!-- <el-icon id="hidden" v-if="!scope.row.isPublic">
                   <Hide />
                 </el-icon> -->
-              <!-- </div>
+              </div>
               <div class="tags-right">
-                <el-tag v-show="tagVisible" type="info" v-for="tag in scope.row.tags" :key="tag"
-                  :color="getTagColor(tag)" @click="queryTag(tag)">
-                  <span class="tag-text">{{ tag }} </span>
+                <el-tag v-show="tagVisible" type="info" v-for="tag in scope.row.tags" 
+                :key="tag.id"
+                  :color="tag.color">
+                  <span class="tag-text">{{ tag.name }} </span>
                 </el-tag>
               </div>
             </div>
           </template>
-        </el-table-column> --> 
-
-        <el-table-column prop="level" label="难度评级" width="100px">
+        </el-table-column>
         
+        <el-table-column prop="level" label="难度评级" width="150px">
+          <template #default="scope">
+            <el-button size="small" :color="levels[scope.row.level]?.color ?? '#BFBFBF'" :dark="true">
+              <span class="tag-text"> {{ levels[scope.row.level]?.label ?? '未知难度' }} </span>
+            </el-button>
+          </template>
         </el-table-column>
 
         <el-table-column prop="status" label="AC/提交" width="120px">
@@ -133,7 +99,7 @@
             <span> {{ scope.row.acceptedNum }} / {{ scope.row.submittedNum }}</span>
           </template>
         </el-table-column>
-        
+        <el-table-column prop="createTime" label="发布时间" width="120px" />
         <el-table-column prop="userVO" label="出题人" width="160px">
           <template #default="scope">
             <router-link class="rlink" :to="'/user/' + scope.row.userVO.id">
@@ -152,15 +118,18 @@ import { reactive,ref,onMounted } from 'vue';
 import { listProblemVOByPage } from '../../api/problem';
 import type { ProblemQueryRequest, ProblemVO } from '../../api/problem/types';
 import { ElMessage } from 'element-plus';
-import type { Tag } from '../../api/tag';
-
+import { getAllTags, type Tag } from '../../api/tag';
+import { useUserStore } from '../../store/user';
+import { RouterLink } from 'vue-router'
 const problems = ref<ProblemVO[]>([])
 const total = ref(0);
 const current = ref(1);
-const pageSize = ref(8);
-const tagList = ref<Tag[]>([]);
+const pageSize = ref(12);
+const tagVisible = ref(true);
+const finished = ref(false);
+const tagList = ref([]);
 const searchParams = reactive<ProblemQueryRequest>({
-  pageSize: 8,
+  pageSize: 12,
   current: 1,
   id:  undefined,
   title: undefined,
@@ -168,36 +137,7 @@ const searchParams = reactive<ProblemQueryRequest>({
   userId: undefined,
   level: undefined
 });
-async function loadData() {
-  ElMessage.success('preparing load data')
-  console.log(searchParams)
-  const res = await listProblemVOByPage(
-    searchParams
-  );
-  ElMessage.success('preparing load data')
-  if (res.code === 200) {
-    ElMessage.success('success to load data')
-
-    problems.value = res.data.records
-    console.log(problems)
-    total.value = Number(res.data.total);
-    console.log(total)
-  } else {
-    ElMessage.warning('failed to load data')
-  }
-}
-const handleCurrentChange = (val: number) => {
-  searchParams.current = val;
-  loadData();
-}
-const cellStyle = (columnIndex ) => {
-  return { textAlign: columnIndex === 1 ? 'left' : 'center' };
-};
-onMounted(() => {
-  loadData();
-});
-
-const tagColorList = [
+const tagColorList =  [
   '#2d8cf0',
   '#3f51b5',
   '#9c27b0',
@@ -208,6 +148,66 @@ const tagColorList = [
   '#E91E63',
   '#ed4014'
 ]
+
+async function loadData() {
+  finished.value = false;
+  let url = location.pathname;
+  if (current.value > 1) {
+    searchParams.current = current;
+  }
+  const res = await listProblemVOByPage(
+    searchParams
+  );
+  if (res.code === 200) {
+    // ElMessage.success('success to load data')
+
+    problems.value = res.data.records
+    total.value = Number(res.data.total);
+    finished.value = true;
+  } else {
+    ElMessage.warning('failed to load data')
+  }
+}
+const hash = (str : string) => {
+  let t = 0;
+  for (let i = 0; i < str.length; i++)
+    t = 31 * t + str.charCodeAt(i);
+  return t;
+}
+const getTagColor = (tag : string) => {
+  return tagColorList[hash(tag) % tagColorList.length];
+}
+
+const handleCurrentChange = (val: number) => {
+  searchParams.current = val;
+  loadData();
+}
+const userStore = useUserStore()  
+const switchTag = () => {
+  tagVisible.value = !tagVisible.value;
+  userStore.tagVisible = tagVisible.value;
+};
+const cellStyle = (columnIndex ) => {
+  return { textAlign: columnIndex === 1 ? 'left' : 'center' };
+};
+async function loadTags() {
+  const res = await getAllTags();
+  if (res.code === 200)  {
+    // ElMessage.success('success to load tags')
+    tagList.value = res.data;
+  } else {
+    ElMessage.error('failed to load tags')
+  }
+}
+onMounted(() => {
+  // 刷新页面后标签的可见性不变
+  if (userStore.tagVisible !== null) {
+    tagVisible.value = userStore.tagVisible === true;
+  }
+  loadTags();
+  loadData();
+});
+
 const levels = [
 {
   index: 0,
@@ -247,6 +247,9 @@ const levels = [
 </script>
 
 <style scoped>
+.rlink:hover {
+  color: #2d71d7;
+}
 .box-card {
   height: auto;
   margin: 10px;

@@ -26,20 +26,20 @@ onMounted(() => {
     </el-main>
     <el-footer id="footer">
       <div style="font-weight: 600; color:#74767a">
-        nywOJ powered by
-        <a href="https://github.com/Baymin-ty/nywOJ" target="_blank" class="rainbow">nywOJ</a>
+        Super OJ powered by
+        <a href="https://github.com/porscher123/oj-backend" target="_blank" class="rainbow">Super OJ</a>
         Developed by
-        <span style="color: black;">ty</span>
+        <span style="color: black;">xinchao wang</span>
       </div>
       <div>
-        <a href="https://beian.miit.gov.cn/" target="_blank" class="rainbow">黑ICP备2022006586号-1</a>
+        <a href="https://beian.miit.gov.cn/" target="_blank" class="rainbow">黑ICP备2025006586号-1</a>
       </div>
     </el-footer>
   </el-container>
   
 </template>
 
-<style lang="css" scoped>
+<style lang="css">
 li,
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -48,7 +48,12 @@ li,
   margin: 0 auto;
   color: #2c3e50;
 }
-
+.rlink {
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  color: #558CDD;
+}
 .el-table .success {
   --el-table-tr-bg-color: var(--el-color-success-light-9);
 }

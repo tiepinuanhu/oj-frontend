@@ -22,7 +22,7 @@ export interface ProblemQueryRequest extends PageRequest {
     title?: string;
     tags?: string[];
     userId?: number;
-    level?: string;
+    level?: number;
 }
 
 export interface ProblemVO {
