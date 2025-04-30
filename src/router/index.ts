@@ -29,8 +29,31 @@ export const routes = [
     meta: {
       needLogin: false,
     },
-    
   },
+  {
+    path: "/problem/:id",
+    name: "ProblemDetail",
+    component: () => import("@/views/problem/ProblemDetail.vue"),
+    props: true,
+    meta: {
+      hiddenInMenu: true,
+    },
+  },
+  {
+    path: "/submission",
+    name: "SubmissionList",
+    component: () => import("@/views/submission/SubmissionList.vue"),
+    props: true,
+  },
+  {
+    path: "/submission/:sid",
+    name: "SubmissionDetail",
+    component: () => import("@/views/submission/SubmissionDetail.vue"),
+    props: true,
+    meta: {
+      hiddenInMenu: true,
+    },
+  }
 ]
 const router = createRouter({
   history: createWebHistory(),

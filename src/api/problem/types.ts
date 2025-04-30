@@ -24,14 +24,19 @@ export interface ProblemQueryRequest extends PageRequest {
     userId?: number;
     level?: number;
 }
-
+export interface JudgeConfig {
+    memoryLimit?: number;
+    timeLimit?: number;
+}
 export interface ProblemVO {
     id?: number;
     title?: string;
     content?: string;
     tags?: Tag[];
-    level?: string;
+    level?: number;
     submittedNum?: number;
     acceptedNum?: number;
     userVO?: UserVO;
+    judgeConfig?: JudgeConfig;
+    createTime?: Date;
 }

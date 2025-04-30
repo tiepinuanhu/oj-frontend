@@ -1,5 +1,5 @@
 <template>
-    <el-menu mode="horizontal" :default-active="currentPath" router="true">
+    <el-menu mode="horizontal" :default-active="selectedKeys" router="true">
         <img src="@/assets/cf-icon.png" class="icon">
         <el-menu-item index="/">
             <el-icon>
@@ -70,22 +70,28 @@
 </template>
 
 <script lang="ts" setup>
-import {useRoute} from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 import { useUserStore } from '../store/user'
 import { ref, onMounted } from 'vue'
 
 const userStore = useUserStore()
 
-let currentPath = ref('')
 onMounted(() => {
     const route = useRoute()
-    currentPath.value = route.path
+    userStore.currentPath = route.path
+    console.log(route.path)
 })
 
 const logout = () => {
     userStore.logout()
 }
-
+// 默认主页
+const selectedKeys = ref(["/"]);
+const router = useRouter();
+// 更新路由后, 更新菜单项中之前选中的item
+router.afterEach((to, from, failure) => {
+  selectedKeys.value = [to.path];
+});
 </script>
 
 <style lang="css" scoped>

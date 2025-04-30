@@ -14,6 +14,7 @@ export const useUserStore = defineStore("user", () => {
   })
   const token = ref("")
   const tagVisible = ref(true)
+  const currentPath = ref("")
   async function setToken(token1: string) {
     instance.defaults.headers.common["Authorization"] = `Bearer ${token1}`
     token.value = token1
@@ -55,7 +56,7 @@ export const useUserStore = defineStore("user", () => {
   //   }
   // }
    
-  return {user, token, setToken,logout, isLogin, tagVisible}
+  return {user, token, setToken,logout, isLogin, tagVisible,currentPath}
 },
 {
   persist: true,

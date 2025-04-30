@@ -8,7 +8,7 @@
           题目列表
           <el-pagination  @current-change="handleCurrentChange" :background="true"
            v-model:current-page="current" v-model:page-size="pageSize"
-            layout="prev, pager, next, jumper" :total="total">
+            layout="total, prev, pager, next, jumper" :total="total">
           </el-pagination>
           <el-button-group>
             <span>

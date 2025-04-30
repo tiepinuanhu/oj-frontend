@@ -1,0 +1,65 @@
+export const getNameColor = (gid, cnt) => {
+  if (gid !== 1)
+    return "#8e44ad";
+  else if (cnt < 1000)
+    return "#606266";
+  else if (cnt < 10000)
+    return "#00BFFF";
+  else if (cnt < 50000)
+    return "#00FF00";
+  else if (cnt < 200000)
+    return "#FF8C00";
+  else
+    return "#FF0000";
+}
+
+export const resColor = {
+  'Submitted': '#2b85e4',
+  'Compiling': '#2b85e4',
+  'Pending': '#606266',
+  'Compile Error': '#9C27B0',
+  'Judging': '#4169E1',
+  'Accepted': '#19be6b',
+  'Wrong Answer': '#E91E63',
+
+  
+  'Time Limit Exceeded': '#ff9900',
+  'Memory Limit Exceeded': '#795548',
+  'Runtime Error': '#ed4014',
+  'Segmentation Fault': '#607D8B',
+  'Output Limit Exceeded': '#880e4f',
+  'Dangerous System Call': '#607D8B',
+  'System Error': '#607D8B',
+  'Canceled': '#606266',
+  'Skipped': '#606266'
+};
+
+export const scoreColor = [
+  '#ff4f4f',
+  '#ff694f',
+  '#f8603a',
+  '#fc8354',
+  '#fa9231',
+  '#f7bb3b',
+  '#ecdb44',
+  '#e2ec52',
+  '#b0d628',
+  '#93b127',
+  '#25ad40',
+]
+
+// import axios from "axios";
+// import store from '@/sto/store';
+
+// export const refreshUserInfo = async () => {
+//   await axios.post('/api/user/getUserInfo').then(res => {
+//     if (res.status === 200) {
+//       store.state.uid = res.data.uid;
+//       store.state.name = res.data.name;
+//       store.state.gid = res.data.gid;
+//       store.state.ip = res.data.ip;
+//       store.state.avatar = res.data.avatar;
+//       store.state.preferenceLang = res.data.preferenceLang;
+//     }
+//   });
+// }
