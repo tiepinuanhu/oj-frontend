@@ -46,7 +46,7 @@ export const routes = [
     props: true,
   },
   {
-    path: "/submission/:sid",
+    path: "/submission/:id",
     name: "SubmissionDetail",
     component: () => import("@/views/submission/SubmissionDetail.vue"),
     props: true,

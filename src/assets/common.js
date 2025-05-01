@@ -20,6 +20,7 @@ export const resColor = {
   'Compile Error': '#9C27B0',
   'Judging': '#4169E1',
   'Accepted': '#19be6b',
+  'ACCEPTED': '#19be6b',
   'Wrong Answer': '#E91E63',
 
   

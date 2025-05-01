@@ -6,19 +6,22 @@ export interface SubmissionAddRequest {
 
 
 export interface JudgeCaseResult {
+  index: number;
   input: string; // 输入内容
   output: string; // 程序输出
   ans: string; // 正确答案
-  message: string; // 判题状态（如 Accepted、Wrong Answer 等）
+  judgeResult: string; // 判题状态（如 Accepted、Wrong Answer 等）
+  gainScore: number;
+  fullScore: number;
   timeCost: string; // 时间消耗（单位可能为 ms，如 "10ms"）
   memoryUsed: string; // 内存使用（单位可能为 KB，如 "20KB"）
 }
 export interface SubmissionResult {
     score: number;
-    status: string;
+    status: number;
+    statusDescription:string
     totalTime: number;
     memoryUsed: number;
-    codeLength: number;
     judgeCaseResults: JudgeCaseResult[];
 }
 export interface SubmissionVO {
@@ -28,13 +31,9 @@ export interface SubmissionVO {
     problemId: number;
     problemTitle: string; // 新增字段
     sourceCode: string;
-    totalTime: number;
-    totalMemory: number;
     codeLength: number;
     submissionResult: SubmissionResult; // 关联类型
-    status: number; // 状态码（整数）
     submissionStatus: string; // 状态描述（如 "waiting"）
-    score: number; // 得分
     language: string; // 编程语言
     createTime: Date; // 时间类型
   }

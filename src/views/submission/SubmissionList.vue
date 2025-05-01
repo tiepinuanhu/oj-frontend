@@ -81,7 +81,7 @@
         <el-table-column prop="SubmissionResult" label="评测状态" width="160px">
           <template #default="scope">
             <span >
-              {{ scope.row.submissionStatus }}
+              {{ scope.row.submissionResult.statusDescription }}
             </span>
           </template>
         </el-table-column>
@@ -104,8 +104,7 @@
         </el-table-column>
         <el-table-column prop="submissionResult" label="语言 / 代码长度" width="150px">
           <template #default="scope">
-            <!-- <span>{{ $store.state.langList[scope.row.lang].des }} / {{ scope.row.codeLength }} B </span> -->
-             {{scope.row.submissionResult.codeLength}}B
+            <span>{{ scope.row.language }} / {{ scope.row.codeLength }} B </span>
           </template>
         </el-table-column>
 
@@ -242,12 +241,12 @@ const handleCurrentChange = (val: number) => {
   current.value = val;
   loadData();
 }
-const cellStyle = ({ row, columnIndex }) => {
-  let style = {};
+const cellStyle = ({ row, columnIndex } : any) => {
+  let style = {} as any;
   style['textAlign'] = 'center';
   if (columnIndex === 3) {
     style['font-weight'] = '500';
-    style['color'] = resColor[row.submissionStatus];
+    style['color'] = resColor[row.submissionResult.statusDescription];
   }
   if (columnIndex === 4) {
     style['font-weight'] = '500';

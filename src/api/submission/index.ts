@@ -16,3 +16,10 @@ export const getSubmissions = (data: SubmissionQueryDTO) => {
       data: data
     });
 };
+export const getSubmissionById = (id: number) => {
+    return instance({
+      url: `/submission/get`, 
+      method: "get", 
+      params: { id }
+    });
+};
