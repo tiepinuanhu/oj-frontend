@@ -72,7 +72,7 @@
             </el-select>
           </div>
           <el-divider />
-            <monacoEditor :value="code" />
+            <monacoEditor :value="code" @update:value="code = $event" />
           <el-divider />
 
           <div style="text-align: center;">
@@ -105,7 +105,7 @@ const problemData = ref<ProblemVO | null>(null);
 const code = ref('')
 const activeTab = ref('problemInfo');
 const currentProblemId = ref(0)
-const langList = ref(['c++', 'pyhton', 'java'])
+const langList = ref(['cpp', 'python', 'java'])
 const submitLang = ref()
 const route = useRoute()
 const levels = [
@@ -137,9 +137,10 @@ const levels = [
 ]
 
 async function getProblemInfo() {
-  const pid = Number(route.params.id)
+  const pid = route.params.id
+  currentProblemId.value = Number(pid)
   const res = await getProblemById(pid)
-  if (res.code == 200) {
+  if (res.code === 200) {
     problemData.value = res.data
   } else {
     console.log(res.message)
@@ -147,16 +148,17 @@ async function getProblemInfo() {
 
 }
 
-const submit = () => { 
-  const res = addSubmission({
+const submit = async () => { 
+  const res = await addSubmission({
     problemId: currentProblemId.value,
     sourceCode: code.value,
     language: submitLang.value
   })
   if (res.code == 200) {
     ElMessage.success('提交成功')
-    router.push('/submission/' + res.data)
+    router.push('/submission/' + res.data.id)
   } else {
+    ElMessage.error('提交失败')
   }
 }
 

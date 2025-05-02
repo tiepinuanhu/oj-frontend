@@ -94,12 +94,12 @@
         </el-table-column>
         <el-table-column prop="submissionResult" label="总用时" width="100px">
           <template #default="scope">
-            <span> {{ scope.row.submissionResult.totalTime }}ms</span>
+            <span> {{ scope.row.submissionResult.totalTime }} ms</span>
           </template>
         </el-table-column>
         <el-table-column prop="submissionResult" label="内存" width="100px">
           <template #default="scope">
-            <span> {{ scope.row.submissionResult.memoryUsed / 1024}}KB </span>
+            <span> {{ scope.row.submissionResult.memoryUsed / 1024}} KB </span>
           </template>
         </el-table-column>
         <el-table-column prop="submissionResult" label="语言 / 代码长度" width="150px">

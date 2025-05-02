@@ -34,12 +34,12 @@
             </el-table-column>
             <el-table-column label="总用时" min-width="8%">
                 <template #default="scope">
-                    <span> {{ scope.row.submissionResult.totalTime }}ms</span>
+                    <span> {{ scope.row.submissionResult.totalTime }} ms</span>
                 </template>
             </el-table-column>
             <el-table-column label="内存" min-width="8%">
                 <template #default="scope">
-                    <span> {{ scope.row.submissionResult.memoryUsed / 1024 }}KB </span>
+                    <span> {{ scope.row.submissionResult.memoryUsed / 1024 }} KB </span>
                 </template>
             </el-table-column>
             <el-table-column prop="codeLength" label="语言 / 代码长度" min-width="12%">
@@ -88,7 +88,8 @@
                         </el-button-group>
                     </div>
                 </template>
-                <!-- <monacoEditor :value="submissionInfo?.sourceCode" :readOnly="true" /> -->
+
+                <monacoEditor v-if="submissionInfo" :value="submissionInfo?.sourceCode" :readOnly="true" />
             </el-card>
         </el-col>
     </el-row>
@@ -124,10 +125,11 @@
                         </template>
                     </el-table-column>
                 </el-table> -->
-                <CaseDisplay  :judgeResults="submissionInfo?.submissionResult?.judgeCaseResults || []" />
-                <!-- <v-md-preview
-                    v-show="submissionInfo.judgeResult === 'Compilation Error' || submissionInfo.judgeResult === 'System Error'"
-                    :text="submissionInfo.compileResult" /> -->
+                <!-- v-show="submissionInfo?.submissionResult.statusDescription === 'Compile Error'
+                     || submissionInfo?.submissionResult.statusDescription === 'System Error'" -->
+                <CaseDisplay  v-if="submissionInfo" 
+                :judgeResults="submissionInfo?.submissionResult?.judgeCaseResults || []" />
+                <!-- <v-md-preview :text="submissionInfo?.submissionResult?.compileErrorMessage" /> -->
             </el-card>
         </el-col>
     </el-row>
@@ -149,6 +151,8 @@ const submissionList = ref<SubmissionVO[]>([])
 const submissionInfo = ref<SubmissionVO>()
 const submissionId = ref(0)
 const mounted = ref(false)
+const judged = ref(false)
+const hasTaken = ref(false)
 const route = useRoute()
 const userStore = useUserStore()
 
@@ -158,11 +162,23 @@ async function loadSubmission() {
     if (res.code  == 200) {
         submissionList.value = [res.data]
         submissionInfo.value = res.data
-        console.info("❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗❗")
+        hasTaken.value = true
+        console.info(res.data)
         ElMessage.success('success to load submission')
-    } else {
+        
+        if (submissionInfo.value?.submissionResult.statusDescription === 'Pending' ||
+          submissionInfo.value?.submissionResult.statusDescription === 'Compiling' 
+          || submissionInfo.value?.submissionResult.statusDescription === 'Judging') {
+            setTimeout(() => {
+              loadSubmission();
+            }, 1000)
+          }
+    } 
+    else {
         ElMessage.error(res.message)
     }
+    mounted.value = true
+
 }
 const tableRowClassName = (obj : any) => {
     return (obj.row.result == 'Accepted' ? 'success' : '');
@@ -192,9 +208,9 @@ const cellStyle2 = ({ row, columnIndex } : any) => {
 }
 onMounted(() => {
     mounted.value = false
+    hasTaken.value = false
     submissionId.value = route.params.id
     loadSubmission()
-    mounted.value = true
 })
 </script>
 

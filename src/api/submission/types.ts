@@ -20,6 +20,7 @@ export interface SubmissionResult {
     score: number;
     status: number;
     statusDescription:string
+    compileErrorMessage:string
     totalTime: number;
     memoryUsed: number;
     judgeCaseResults: JudgeCaseResult[];

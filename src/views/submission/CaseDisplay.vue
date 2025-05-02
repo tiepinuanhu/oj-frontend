@@ -10,11 +10,16 @@
             </span>
           </el-col>
 
-          <el-col :span="6">
+          <el-col :span="4">
             <span class="tag" :style="{ 'color': resColor[caseResult.judgeResult] }">
               {{ caseResult.judgeResult }}
             </span>
-            
+          </el-col>
+
+          <el-col :span="5">
+            <span class="tag" >
+              得分：{{ caseResult.gainScore }} / {{ caseResult.fullScore }}
+            </span>
           </el-col>
           <el-col :span="5">
             <span class="tag">
@@ -24,10 +29,30 @@
 
           <el-col :span="5">
             <span class="tag">
-              memory: {{ caseResult.memoryUsed }}
+              memory: {{ caseResult.memoryUsed / 1024}}KB
             </span>
           </el-col>
         </template>
+        <div class="sub" :style="{ 'color': resColor[caseResult.judgeResult] }">
+          <span class="tag">
+            input
+          </span>
+          <pre>{{ caseResult.input }}</pre>
+          <span class="tag">
+            output
+          </span>
+          <pre>{{ caseResult.output }}</pre>
+          <span class="tag">
+            ans
+          </span>
+          <pre>{{ caseResult.ans }}</pre>
+          <!-- <span class="tag">
+            checker
+          </span> -->
+          <!-- <pre>{{ caseResult.compareResult }}</pre> -->
+        </div>
+
+
       </el-collapse-item>
     </el-collapse>
   </div>
