@@ -7,6 +7,7 @@ import { ElMessage } from "element-plus";
 export const useUserStore = defineStore("user", () => {
 
   const user = reactive({
+    userId: 0,
     userAccount: "",
     userName: "",
     userAvatar: "",

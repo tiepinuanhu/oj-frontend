@@ -46,6 +46,21 @@ export const routes = [
     props: true,
   },
   {
+    path: "/contest",
+    name: "ContestList",
+    component: () => import("@/views/contest/ContestList.vue"),
+    props: true,
+  },
+  {
+    path: "/contest/:id",
+    name: "ContestDetail",
+    component: () => import("@/views/contest/ContestDetail.vue"),
+    props: true,
+    meta: {
+      hiddenInMenu: true,
+    },
+  },
+  {
     path: "/submission/:id",
     name: "SubmissionDetail",
     component: () => import("@/views/submission/SubmissionDetail.vue"),
