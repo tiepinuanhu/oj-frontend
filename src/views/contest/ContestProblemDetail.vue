@@ -1,5 +1,4 @@
 <template>
-
   <div class="problem-detail">
     <el-tabs tab-position="top" v-model="activeTab">
       <el-tab-pane label="题目" name="problemInfo">
@@ -15,15 +14,11 @@
               <template #header>
                 <div class="card-header" style="height: 25px;">
                   <p class="title">
-                    #{{ problemData?.id }}、{{ problemData?.title }}
-                    <!-- <el-icon id="hidden" v-if="!problemInfo.isPublic">
-            <Hide />
-          </el-icon> -->
+                    {{ String.fromCharCode(problemData?.pindex  + 65)  }}.            {{ problemData?.title }}
                   </p>
                 </div>
               </template>
-              <!-- <v-md-preview :text="problemData?.content"/> -->
-              <VMdViewer :text="problemData?.content"></VMdViewer>
+              <v-md-preview :text="problemData?.content"></v-md-preview>
             </el-card>
           </el-col>
           <el-col :xs="24" :sm="24" :md="6">
@@ -47,22 +42,6 @@
                 <el-descriptions-item label="空间限制"> {{ problemData?.judgeConfig?.memoryLimit }}
                   MB</el-descriptions-item>
                 <el-descriptions-item label="比对方式"> 传统文本比对 </el-descriptions-item>
-                <el-descriptions-item label="题目标签">
-                  <el-tag type="info" v-for="tag in problemData?.tags" :key="tag.id" :color="tag.color">
-                    <span class="tag-text">{{ tag.name }} </span>
-                  </el-tag>
-                </el-descriptions-item>
-                <el-descriptions-item label="难度评级">
-                  <el-button size="small" :color="levels[problemData?.level]?.color ?? '#BFBFBF'" :dark="true">
-                    <span style="color: white; font-weight: 600; font-size: 14px;">
-                      {{ levels[problemData?.level]?.label ?? '未知难度' }} </span>
-                  </el-button>
-                </el-descriptions-item>
-                <el-descriptions-item label="出题人">
-                  <!-- <router-link class="rlink" :to="'/user/' + problemInfo.publisherUid">
-          {{ problemInfo.publisher }}
-        </router-link> -->
-                </el-descriptions-item>
                 <el-descriptions-item label="发布时间"> {{ problemData?.createTime }} </el-descriptions-item>
               </el-descriptions>
             </el-card>
@@ -70,12 +49,12 @@
         </el-row>
       </el-tab-pane>
       <el-tab-pane label="提交" name="submit">
-      <template #label>
+        <template #label>
         <el-icon style="margin: 4px;">
             <Upload />
           </el-icon>
           提交代码
-        </template>
+          </template> 
         <div>
           <div style="margin: 10px;">
             选择语言：
@@ -105,56 +84,41 @@
 </template>
 
 <script setup lang="ts">
-import { getProblemById } from '../../api/problem';
+import { getProblemInContest } from '../../api/contest/index'
 import type { ProblemVO } from '../../api/problem/types';
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router';
 import VMdViewer from '../../components/VMdViewer.vue';
-import { addSubmission } from '../../api/submission';
+import { addSubmissionInContest } from '../../api/contest';
 import { ElMessage } from 'element-plus';
 import router from '../../router';
+import type { ContestProblemVO } from '../../api/contest/types';
 import { useUserStore } from '../../store/user';
-const problemData = ref<ProblemVO | null>(null);
+
+
+
+const problemData = ref<ContestProblemVO | null>(null);
 const code = ref('')
 const activeTab = ref('problemInfo');
-const currentProblemId = ref(0)
+const contestId = ref("")
+const problemIndexInContest = ref(0)
 const langList = ref(['cpp', 'python', 'java'])
 const submitLang = ref()
 const route = useRoute()
-const levels = [
-  {
-    label: '暂未评级',
-    color: '#BFBFBF'
-  },
-  {
-    label: '入门',
-    color: '#FE4C61'
-  },
-  {
-    label: '普及',
-    color: '#FFC116'
-  },
-  {
-    label: '提高',
-    color: '#52C41A'
-  },
-  {
-    label: '省选',
-    color: '#3498DB'
-  },
-  {
-    label: 'NOI / NOI+',
-    color: '#0E1D69'
-  },
 
-]
-
+/**
+ * 根据cid和idx获取题目信息
+ */
 async function getProblemInfo() {
-  const pid = route.params.id
-  currentProblemId.value = Number(pid)
-  const res = await getProblemById(pid)
+  const cid = route.params.cid
+  const idx = route.params.idx
+  contestId.value = cid
+  problemIndexInContest.value = idx
+  const res = await getProblemInContest(contestId.value, problemIndexInContest.value)
   if (res.code === 200) {
+    ElMessage.success('获取题目信成功')
     problemData.value = res.data
+    console.log(res.data)
   } else {
     console.log(res.message)
   }
@@ -162,15 +126,16 @@ async function getProblemInfo() {
 }
 const userStore = useUserStore()
 const submit = async () => { 
-  const res = await addSubmission({
-    userId: userStore.user.userId,
-    problemId: currentProblemId.value,
+  const res = await addSubmissionInContest({
+    contestId:  contestId.value,
+    problemId: problemData.value?.id,
     sourceCode: code.value,
-    language: submitLang.value
+    language: submitLang.value,
+    userId: userStore.user.userId
   })
   if (res.code == 200) {
     ElMessage.success('提交成功')
-    router.push('/submission/' + res.data.id)
+    router.push('/contest/' + contestId.value);
   } else {
     ElMessage.error('提交失败')
   }

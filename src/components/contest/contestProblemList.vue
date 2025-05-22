@@ -3,63 +3,74 @@
     :cell-style="{ textAlign: 'center' }" v-loading="!finished">
 
     <el-table-column type="index" min-width="10%">
-      <template #header>
+      <template  #header>
         <el-button circle @click="load_problemList" color="#626aef" plain>
           <el-icon>
             <Refresh />
           </el-icon>
         </el-button>
       </template>
+      <template #default="scope"> 
+        <span >{{ String.fromCharCode(scope.row.pindex  + 65) }}</span>
+      </template>
     </el-table-column>
 
     <el-table-column prop="title" label="标题" min-width="50%">
       <template #default="scope">
-        <router-link class="rlink" :to="'/contest/' + cid + '/problem/' + scope.row.pindex">
+        <router-link v-if="contestInfo?.status == 1" class="rlink" :to="'/contest/' + cid + '/problem/' + scope.row.pindex">
+          {{ scope.row.title }}
+        </router-link>
+        <router-link v-if="contestInfo?.status == 2" class="rlink" :to="'/problem/' +  scope.row.id">
           {{ scope.row.title }}
         </router-link>
       </template>
     </el-table-column>
-    <!-- <el-table-column v-if="ctype === 'IOI'" prop="score" label="得分" min-width="15%" /> -->
-    <!-- <el-table-column prop="weight" label="满分" min-width="15%" /> -->
-    <!-- <el-table-column prop="publisher" label="出题人" min-width="20%">
-      <template #default="scope">
-        <router-link class="rlink" :to="'/user/' + scope.row.publisherUid">
-          {{ scope.row.publisher }}
-        </router-link>
-      </template>
-    </el-table-column> -->
+    <el-table-column prop="gainScore" label="得分" min-width="15%" />
+    <el-table-column prop="fullScore" label="满分" min-width="15%" />
   </el-table>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { getProblemsInContest } from '../../api/contest'
 import { useRoute } from 'vue-router'
-import type { ContestProblemVO } from '../../api/contest/types'
+import type { ContestProblemVO,ContestVO } from '../../api/contest/types'
+import { getContest } from '../../api/contest'
 import { ElMessage } from 'element-plus'
+import { useUserStore } from '../../store/user'
 
 
 const route = useRoute()
 const problemList = ref<ContestProblemVO[]>([])
-const cid = ref(0)
+const cid = ref('')
+const contestInfo = ref<ContestVO>()
 const finished = ref(false)
 
-
+const userStore = useUserStore()
 
 const load_problemList = async () => {
-  ElMessage.info('获取题目ing')
+  // ElMessage.info('获取题目ing')
 
-  const res = await getProblemsInContest(cid.value)
+  const res = await getProblemsInContest(cid.value, userStore.user.userId)
   if (res.code === 200) {
+    // ElMessage.success('获取题目成功')
     problemList.value = res.data
     finished.value = true
   } else {
 
   }
 }
+const load_contestInfo = async () => {
+  const res = await getContest(cid.value)
+  if (res.code === 200) {
+    contestInfo.value = res.data
+  } else {
+    ElMessage.error('获取比赛信息失败')
+  }
+}
 onMounted(()=>{
-  const pid = route.params.id
-  cid.value = pid
+  cid.value = route.params.id
+  load_contestInfo()
   load_problemList()
 })
 </script>

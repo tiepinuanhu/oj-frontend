@@ -14,7 +14,7 @@
             <span>
               <el-popconfirm v-if="userStore.user.userRole >= 1" confirm-button-text="确认"
               cancel-button-text="取消" title="确认添加题目?"
-                @confirm="">
+                @confirm="addProblem">
                 <template #reference>
                   <el-button type="success">
                     <el-icon class="el-icon--left">
@@ -53,10 +53,10 @@
           <el-form-item>
             <el-select v-model="searchParams.tags" multiple filterable clearable placeholder="题目标签" style="width: 300px;"
               @change="loadData">
-              <el-option v-for="tag in tagList" :key="tag.id" :label="tag.name" :value="tag.name">
-                <el-tag v-show="tagVisible" type="info" :color="tag.color">
+              <el-option v-for="tag in tagList" :key="tag.id" :label="tag.name" :value="tag.id">
+                  <el-tag v-show="tagVisible" type="info" :color="tag.color">
                   <span class="tag-text">{{ tag.name }} </span>
-                </el-tag>
+                  </el-tag>
               </el-option>
             </el-select>
           </el-form-item>
@@ -84,15 +84,15 @@
           <template #default="scope">
             <div class="title-container">
               <div class="title-left">
-                <router-link class="rlink" :to="'/problem/' + scope.row.id">
-                  {{ scope.row.title }}
+                <router-link class="rlink" :to="'/problem/' + scope.row?.id">
+                  {{ scope.row?.title }}
                 </router-link>
-                <!-- <el-icon id="hidden" v-if="!scope.row.isPublic">
+                <el-icon id="hidden" v-if="!scope.row?.isPublic">
                   <Hide />
-                </el-icon> -->
+                </el-icon>
               </div>
               <div class="tags-right">
-                <el-tag v-show="tagVisible" type="info" v-for="tag in scope.row.tags" 
+                <el-tag v-show="tagVisible && scope.row?.tags" type="info" v-for="tag in scope.row?.tags" 
                 :key="tag.id"
                   :color="tag.color">
                   <span class="tag-text">{{ tag.name }} </span>
@@ -112,7 +112,7 @@
 
         <el-table-column prop="status" label="AC/提交" width="120px">
           <template #default="scope">
-            <span> {{ scope.row.acceptedNum }} / {{ scope.row.submittedNum }}</span>
+            <span> {{ scope.row?.acceptedNum }} / {{ scope.row?.submittedNum }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="发布时间" width="120px" />
@@ -131,14 +131,19 @@
 
 <script setup lang="ts">
 import { reactive,ref,onMounted } from 'vue';
-import { listProblemVOByPage } from '../../api/problem';
+import { listProblemVOByPage, createProblem } from '../../api/problem';
 import type { ProblemQueryRequest, ProblemVO } from '../../api/problem/types';
 import { ElMessage } from 'element-plus';
 import { getAllTags, type Tag } from '../../api/tag';
 import { useUserStore } from '../../store/user';
 import { RouterLink } from 'vue-router';
 import qs from 'qs';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+
+
+const userStore = useUserStore()  
+const route = useRoute();
+const router = useRouter();
 /**
  * 组件数据
  */
@@ -153,10 +158,10 @@ const searchParams = reactive<ProblemQueryRequest>({
   id:  undefined,
   title: undefined,
   tags: undefined,
-  userId: undefined,
+  userId: userStore.user.userId,
   level: undefined
 });
-const route = useRoute();
+
 /**
  * 请求后端题目数据
  * URL路径参数展示页号，修改url可以实现换页
@@ -201,7 +206,6 @@ const handleCurrentChange = (val: number) => {
   searchParams.current = val;
   loadData();
 }
-const userStore = useUserStore()  
 const switchTag = () => {
   tagVisible.value = !tagVisible.value;
   userStore.tagVisible = tagVisible.value;
@@ -213,7 +217,6 @@ const clear = () => {
   searchParams.id = undefined;
   searchParams.title = undefined;
   searchParams.tags = undefined;
-  searchParams.userId = undefined;
   searchParams.level = undefined;
   loadData();
 };
@@ -226,6 +229,15 @@ async function loadTags() {
     ElMessage.error('failed to load tags')
   }
 }
+const addProblem = async () => {
+  const res1 = await createProblem(userStore.user.userId);
+  if (res1.code === 200) {
+    ElMessage.success('success to create problem' + res1.data)
+    router.push('/problem/edit/' + res1.data);
+  } else {  
+    ElMessage.error('failed to create problem')
+  }
+};
 onMounted(() => {
   // 刷新页面后标签的可见性不变
   if (userStore.tagVisible !== null) {

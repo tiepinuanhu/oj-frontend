@@ -1,5 +1,6 @@
 export interface SubmissionAddRequest {
-    problemId?: number; // 可选字段（对应 Java 中可能为 null 的 Long）
+    userId:  number;
+    problemId?: string; // 可选字段（对应 Java 中可能为 null 的 Long）
     sourceCode?: string;
     language?: string;
 }
@@ -47,7 +48,7 @@ export interface PageRequest {
     sortField?: string;
     // 排序顺序（默认升序）
     sortOrder?: string;
-  }
+}
 export interface SubmissionQueryDTO extends PageRequest {
     problemId?: number;
     userId?: number;

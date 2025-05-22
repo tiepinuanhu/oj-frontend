@@ -1,5 +1,5 @@
 import type { UserVO } from "../user/type";
-
+import type { Tag } from "../tag";
 // 假设 CommonConstant 是一个常量对象，包含 SORT_ORDER_ASC 常量
 const CommonConstant = {
     SORT_ORDER_ASC: 'asc',
@@ -18,7 +18,7 @@ export interface PageRequest {
 }
 
 export interface ProblemQueryRequest extends PageRequest {
-    id?: number;
+    id?: string;
     title?: string;
     tags?: Tag[];
     userId?: number;
@@ -39,4 +39,14 @@ export interface ProblemVO {
     userVO?: UserVO;
     judgeConfig?: JudgeConfig;
     createTime?: Date;
+}
+export interface ProblemEditRequest {
+    id:string
+  title: string;
+  content: string;
+  tags: number[];
+  level: number;
+  judgeConfig: JudgeConfig; // 裁判配置对象
+  userId: string; // Java 的 Long 对应 TypeScript 的 number
+  isPublic:number
 }

@@ -19,7 +19,8 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      'codemirror': path.resolve(__dirname, 'node_modules/codemirror'),
       '@': path.resolve(__dirname, 'src')
-    }
+    },
   },
 })

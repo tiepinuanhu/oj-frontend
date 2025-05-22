@@ -57,7 +57,7 @@
                 </el-table-column>
                 <el-table-column prop="length" label="时长" min-width="12%">
                     <template #default="scope">
-                        <span> {{ Math.floor(scope.row.duration / 60) }} min </span>
+                        <span> {{ Math.floor(scope.row.duration) }} min </span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="type" label="类型" min-width="7%">

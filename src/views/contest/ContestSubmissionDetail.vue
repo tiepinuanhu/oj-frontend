@@ -8,9 +8,6 @@
                     <router-link class="rlink" :to="/problem/ + scope.row.problemId">
                         {{ scope.row.problemTitle }}
                     </router-link>
-                    <!-- <el-icon id="hidden" v-if="!scope.row.isPublic && !isContest">
-                        <Hide />
-                    </el-icon> -->
                 </template>
             </el-table-column>
             <el-table-column prop="userAccount" label="提交者" min-width="8%">
@@ -47,7 +44,7 @@
                     <span>{{ scope.row.language }} / {{ scope.row.codeLength }} B </span>
                 </template>
             </el-table-column>
-            <el-table-column prop="createTime" label="提交时间" min-width="13%" />
+            <el-table-column prop="submissionTime" label="提交时间" min-width="13%" />
         </el-table>
     </el-row>
 
@@ -59,7 +56,7 @@
                 <template #header>
                     <div class=" card-header">
                         代码
-                        <!-- <el-button-group>
+                        <el-button-group>
                             <span>
                                 <el-popconfirm v-if="userStore.user.userRole >= 1" confirm-button-text="确认"
                                     cancel-button-text="取消" title="确认取消成绩?">
@@ -85,7 +82,7 @@
                                 </el-popconfirm>
                             </span>
 
-                        </el-button-group> -->
+                        </el-button-group>
                     </div>
                 </template>
 
@@ -101,35 +98,8 @@
                         测试点详情
                     </div>
                 </template>
-                <!-- <el-table
-                    :data="submissionInfo?.submissionResult" height="auto" 
-                    :row-class-name="tableRowClassName"
-                    :cell-style="cellStyle" :header-cell-style="{ textAlign: 'center' }">
-
-
-                    <el-table-column prop="caseId" label="#" min-width="10%" />
-                    <el-table-column prop="subtaskId" label="子任务" min-width="10%" />
-                    <el-table-column prop="judgeResult" label="结果" min-width="40%">
-                        <template #default="scope">
-                            <span> {{ scope.row.submissionStatus }} </span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="time" label="用时" min-width="20%">
-                        <template #default="scope">
-                            <span> {{ Math.floor(scope.row.submissionResult.totalTime) }} ms</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="memory" label="内存" min-width="20%">
-                        <template #default="scope">
-                            <span> {{ scope.row.submissionResult.memoryUsed }} </span>
-                        </template>
-                    </el-table-column>
-                </el-table> -->
-                <!-- v-show="submissionInfo?.submissionResult.statusDescription === 'Compile Error'
-                     || submissionInfo?.submissionResult.statusDescription === 'System Error'" -->
                 <CaseDisplay  v-if="submissionInfo" 
                 :judgeResults="submissionInfo?.submissionResult?.judgeCaseResults || []" />
-                <!-- <v-md-preview :text="submissionInfo?.submissionResult?.compileErrorMessage" /> -->
             </el-card>
         </el-col>
     </el-row>
@@ -137,18 +107,18 @@
 
 <script setup lang="ts">
 import { ref, onMounted, } from "vue";
-import type { SubmissionVO } from "../../api/submission/types";
-import { useRoute, useRouter } from "vue-router";
-import { getSubmissionById } from "../../api/submission";
+import { useRoute} from "vue-router";
+import { getSubmissionInContestById } from "../../api/contest/index";
 import { ElMessage } from "element-plus";
 import { resColor, scoreColor } from '../../assets/common'
 import { useUserStore } from "../../store/user";
-import CaseDisplay from "./caseDisplay.vue"
+import CaseDisplay from "../submission/CaseDisplay.vue"
+import type { ContestSubmissionVO } from "../../api/contest/types";
 
 
 
-const submissionList = ref<SubmissionVO[]>([])
-const submissionInfo = ref<SubmissionVO>()
+const submissionList = ref<ContestSubmissionVO[]>([])
+const submissionInfo = ref<ContestSubmissionVO>()
 const submissionId = ref(0)
 const mounted = ref(false)
 const judged = ref(false)
@@ -158,7 +128,7 @@ const userStore = useUserStore()
 
 
 async function loadSubmission() {
-    const res = await getSubmissionById(submissionId.value);
+    const res = await getSubmissionInContestById(submissionId.value);
     if (res.code  == 200) {
         submissionList.value = [res.data]
         submissionInfo.value = res.data

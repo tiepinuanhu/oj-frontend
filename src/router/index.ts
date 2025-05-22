@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "../store/user";
 import { isVisible } from "element-plus/es/utils/index.mjs";
+import component from "element-plus/es/components/tree-select/src/tree-select-option.mjs";
 export const routes = [
   
   {
@@ -61,6 +62,24 @@ export const routes = [
     },
   },
   {
+    path: "/contest/submission/:id",
+    name: "ContestSubmissionDetail",
+    component: () => import("@/views/contest/ContestSubmissionDetail.vue"),
+    props: true,
+    meta: {
+      hiddenInMenu: true,
+    },
+  },
+  {
+    path: "/contest/:cid/problem/:idx",
+    name: "ContestProblemDetail",
+    component: () => import("@/views/contest/ContestProblemDetail.vue"),
+    meta: {
+      hiddenInMenu: true,
+    },
+
+  },
+  {
     path: "/submission/:id",
     name: "SubmissionDetail",
     component: () => import("@/views/submission/SubmissionDetail.vue"),
@@ -68,6 +87,15 @@ export const routes = [
     meta: {
       hiddenInMenu: true,
     },
+  },
+  {
+    path:'/problem/edit/:pid',
+    name:'ProblemEdit',
+    component: () => import('@/views/problem/ProblemEdit.vue'),
+    props:true,
+    meta:{
+      hiddenInMenu:true,
+    }
   }
 ]
 const router = createRouter({

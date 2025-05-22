@@ -1,5 +1,5 @@
 import instance from "../../axios/request";
-import type { LoginParams } from "./type";
+import type { LoginParams,UserRegisterRequest } from "./type";
 
 
 
@@ -12,3 +12,10 @@ export const userLogin = (data: LoginParams) => {
   });
 };
 
+export const userRegister = (data: UserRegisterRequest) => {
+  return instance({
+    url: "/user/register",
+    method: "post",
+    data: data
+  });
+};
