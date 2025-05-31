@@ -1,6 +1,17 @@
 <template>
   <el-row>
-    <el-input v-model="addpid" style="width: 150px;" placeholder="添加题目pid" @keyup.enter="addProblem" />
+    <el-select v-model="addpid" filterable  
+    placeholder="搜索并选择题目" style="width: 240px">
+      <el-option v-for="item in options" :key="item.id" :label="item.id" :value="item.id">
+        <span style="float: left">{{ item.id }}</span>
+        <span style=" float: right;
+          color: var(--el-text-color-secondary);
+          font-size: 13px;">
+          {{ item.title }}
+        </span>
+      </el-option>
+
+    </el-select>
     <el-button-group style="margin: 5px;">
       <span>
         <el-button type="success" :disabled="!addpid.length" @click="addProblem">
@@ -28,55 +39,55 @@
   </el-row>
   <el-row>
     <el-table style="margin-left: 30px;min-height: 600px;" :data="problemList" min-height="600px"
-        :header-cell-style="{ textAlign: 'center' }" :cell-style="{ textAlign: 'center' }">
+      :header-cell-style="{ textAlign: 'center' }" :cell-style="{ textAlign: 'center' }">
 
-        <el-table-column prop="problemId" label="pid" min-width="10%" />
+      <el-table-column prop="problemId" label="pid" min-width="10%" />
 
-        <el-table-column prop="title" label="标题" min-width="25%">
-          <template #default="scope">
-            <router-link class="rlink" :to="'/problem/' + scope.row.problemId">
-              {{ scope.row.title }}
-            </router-link>
-            <el-icon id="hidden" v-if="!scope.row.isPublic">
-              <Hide />
+      <el-table-column prop="title" label="标题" min-width="25%">
+        <template #default="scope">
+          <router-link class="rlink" :to="'/problem/' + scope.row.problemId">
+            {{ scope.row.title }}
+          </router-link>
+          <el-icon id="hidden" v-if="!scope.row.isPublic">
+            <Hide />
+          </el-icon>
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="problemIndex" label="顺序" min-width="15%">
+        <template #default="scope">
+          <el-input v-model="scope.row.problemIndex" style="height:25px; width: 30px;" />
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="fullScore" label="满分" min-width="17%">
+        <template #default="scope">
+          <el-input v-model="scope.row.fullScore" style="height:25px; width: 50px;" />
+        </template>
+      </el-table-column>
+
+
+
+      <el-table-column prop="createTime" label="发布时间" min-width="20%" />
+
+      <el-table-column label="出题人" min-width="18%">
+        <template #default="scope">
+          <router-link class="rlink" :to="'/user/' + scope.row.publisherId">
+            {{ scope.row.publisherName }}
+          </router-link>
+        </template>
+      </el-table-column>
+
+      <el-table-column fixed="right" label="删除" min-width="10%">
+        <template #default="scope">
+          <el-button link type="primary" size="small" @click.prevent="problemList.splice(scope.$index, 1)">
+            <el-icon>
+              <CloseBold />
             </el-icon>
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="problemIndex" label="顺序" min-width="15%">
-          <template #default="scope">
-            <el-input v-model="scope.row.problemIndex" style="height:25px; width: 30px;" />
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="fullScore" label="满分" min-width="17%">
-          <template #default="scope">
-            <el-input v-model="scope.row.fullScore" style="height:25px; width: 50px;" />
-          </template>
-        </el-table-column>
-
-
-
-        <el-table-column prop="createTime" label="发布时间" min-width="20%" />
-
-        <el-table-column label="出题人" min-width="18%">
-          <template #default="scope">
-            <router-link class="rlink" :to="'/user/' + scope.row.publisherId">
-              {{ scope.row.publisherName }}
-            </router-link>
-          </template>
-        </el-table-column>
-
-        <el-table-column fixed="right" label="删除" min-width="10%">
-          <template #default="scope">
-            <el-button link type="primary" size="small" @click.prevent="problemList.splice(scope.$index, 1)">
-              <el-icon>
-                <CloseBold />
-              </el-icon>
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
   </el-row>
 </template>
 
@@ -84,15 +95,17 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { AddingProblem, ContestProblemVO, ContestProblemSimpleVO } from '../../api/contest/types'
-import { checkProblemCanUsedInContest, getProblemById } from '../../api/problem/index'
+import { checkProblemCanUsedInContest, getNotPublicProblems } from '../../api/problem/index'
 import { updateContestProblems, getContestProblemss, } from '../../api/contest/index'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '../../store/user'
+import type { ProblemVO } from '../../api/problem/types'
 const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore();
 
 const problemList = ref<ContestProblemSimpleVO[]>([])
+const options = ref<ProblemVO[]>([])
 // const problemAddList = reactive<AddingProblem[]>([])
 const total = ref(0)
 const cid = ref("")
@@ -118,6 +131,13 @@ const addProblem = async () => {
     ElMessage.error('题目不存在');
   }
 }
+const filterByTitle = (query: string) => {
+  // 过滤条件：title包含查询字符串（不区分大小写）
+  if (!query) return options.value; // 无查询时显示全部
+  return options.value.filter(item => 
+    item.title.toLowerCase().includes(query.toLowerCase())
+  );
+};
 const updateContestProblem = async () => {
   const res = await updateContestProblems({
     contestId: cid.value,
@@ -140,14 +160,22 @@ const all = async () => {
     ElMessage.error('获取题目失败');
   }
 }
-
+const getProblemsNotPublic = async () => {
+  const res = await getNotPublicProblems();
+  if (res.code === 200) {
+    ElMessage.success('获取题目成功');
+    options.value = res.data;
+  } else {
+    ElMessage.error('获取题目失败');
+  }
+}
 onMounted(() => {
   cid.value = route.params.id;
   all();
+  getProblemsNotPublic();
 })
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .draggable {
   /* width: 300px; */

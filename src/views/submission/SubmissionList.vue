@@ -10,12 +10,6 @@
           :page-size="pageSize"
             layout="total, prev, pager, next, jumper" :total="total"></el-pagination>
           <el-button-group>
-            <!-- <el-button type="success" @click="mySub">
-              <el-icon class="el-icon--left">
-                <UserFilled />
-              </el-icon>
-              我的提交
-            </el-button> -->
             <el-button type="primary" @click="loadData">
               <el-icon class="el-icon--left">
                 <Refresh />
@@ -29,19 +23,23 @@
 
       <!-- 😍😍😍😍😍筛选搜索😍😍😍😍😍😍 -->
       <div style="display: inline-flex;">
+        <el-checkbox style="margin-right: 25px;"  v-model="onlySelf" label="只看自己" @change="loadData"/>
+
         <el-form :inline="true" :model="filter">
           <el-form-item>
-            <el-input v-model="filter.problemId" type="text" placeholder="题目编号" style="width: 100px;"
+            <el-input v-model="filter.problemId" type="text" placeholder="题目编号" 
+            style="width: 100px;"
               @keyup.enter="loadData" />
           </el-form-item>
           <el-form-item>
-            <el-select v-model="filter.JudgeResult" placeholder="评测结果" style="width: 200px;">
-              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+            <el-select v-model="filter.judgeResult" placeholder="评测结果" style="width: 200px;">
+              <el-option v-for="item in options" :key="item.label" :label="item.label"
+               :value="item.label" />
             </el-select>
           </el-form-item>
           <el-form-item>
             <el-select v-model="filter.language" placeholder="提交语言" style="width: 160px;">
-              <!-- <el-option v-for="l in $store.state.langList" :key="l.id" :label="l.des" :value="l.id" /> -->
+              <el-option v-for="l in langList" :key="l.id" :label="l.des" :value="l.des" />
             </el-select>
           </el-form-item>
         </el-form>
@@ -133,52 +131,23 @@ import { resColor, scoreColor } from '../../assets/common'
  * 组件数据
  */
 const submissionList = ref<SubmissionVO[]>([])
-
-const options = [{
-  value: -1,
-  label: '不限结果',
-}, {
-  value: 4,
+const langList = [
+  { id: 1, des: 'cpp' },
+  { id: 2, des: 'python' },
+  { id: 3, des: 'java' },
+]
+const options = [ {
+  value: 5,
   label: 'Accepted',
 }, {
-  value: 5,
+  value: 6,
   label: 'Wrong Answer',
 }, {
-  value: 6,
+  value: 7,
   label: 'Time Limit Exceeded',
 }, {
-  value: 7,
-  label: 'Memory Limit Exceeded',
-}, {
-  value: 8,
-  label: 'Runtime Error',
-}, {
-  value: 9,
-  label: 'Segmentation Fault',
-}, {
   value: 3,
-  label: 'Compilation Error',
-}, {
-  value: 10,
-  label: 'Output Limit Exceeded',
-}, {
-  value: 0,
-  label: 'Waiting',
-}, {
-  value: 1,
-  label: 'Pending',
-}, {
-  value: 2,
-  label: 'Rejudging',
-}, {
-  value: 11,
-  label: 'Dangerous System Call',
-}, {
-  value: 12,
-  label: 'System Error',
-}, {
-  value: 13,
-  label: 'Canceled',
+  label: 'Compile Error',
 }];
 const total = ref(0);
 const current = ref(1);
@@ -186,17 +155,17 @@ const pageSize = ref(9);
 
 const finished = ref(false);
 
-const filter = ref({
-  problemId: undefined,
+const filter = ref<SubmissionQueryDTO>({
   userId: undefined,
-  JudgeResult: undefined,
-  language: undefined,
+  problemId: undefined,
+    language: undefined,
+    judgeResult: undefined
 });
 
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore()
-
+const onlySelf = ref(true)
 /**
  * 请求后端题目数据
  * URL路径参数展示页号，修改url可以实现换页
@@ -205,6 +174,11 @@ async function loadData() {
   finished.value = false;
 
   const param: Record<string, any> = {};
+  if (onlySelf.value == true) {
+    filter.value.userId = userStore.user.userId;
+  } else {
+    filter.value.userId = undefined;
+  }
   if (filter.value.userId !== null && filter.value.userId !== undefined) param.level = filter.value.userId;
   if (filter.value.problemId !== null && filter.value.problemId !== undefined) param.level = filter.value.problemId;
   if (filter.value.language !== null && filter.value.language !== undefined) param.level = filter.value.language;
@@ -221,8 +195,9 @@ async function loadData() {
    * 💕💕💕...是展开语法
    */
   const res = await getSubmissions({
+    ...filter.value,
     current: current.value,
-    pageSize: pageSize.value
+    pageSize: pageSize.value,
   });
   if (res.code === 200) {
     ElMessage.success('success to load data')
@@ -258,7 +233,7 @@ const cellStyle = ({ row, columnIndex } : any) => {
 const clear = () => {
   filter.value.problemId = undefined;
   filter.value.userId = undefined;
-  filter.value.JudgeResult = undefined;
+  filter.value.judgeResult = undefined;
   filter.value.language = undefined;
   loadData();
 };
@@ -270,7 +245,14 @@ onMounted(() => {
   }
   loadData();
 });
-
+const mySub =  () => {
+  if (filter.value.userId) {
+    filter.value.userId = undefined;
+  } else {
+    filter.value.userId = userStore.user.userId
+  }
+  loadData();
+}
 const levels = [
   {
     index: 0,

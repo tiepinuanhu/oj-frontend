@@ -12,18 +12,19 @@
           </el-pagination>
           <el-button-group>
             <span>
-              <el-popconfirm v-if="userStore.user.userRole >= 1" confirm-button-text="确认"
+              <!-- <el-popconfirm  confirm-button-text="确认"
               cancel-button-text="取消" title="确认添加题目?"
-                @confirm="addProblem">
+                >
                 <template #reference>
-                  <el-button type="success">
-                    <el-icon class="el-icon--left">
-                      <Plus />
-                    </el-icon>
-                    添加题目
-                  </el-button>
+                  
                 </template>
-              </el-popconfirm>
+              </el-popconfirm> -->
+              <el-button v-if="userStore.user.userRole >= 1" @click="addProblem" type="success">
+                <el-icon class="el-icon--left">
+                  <Plus />
+                </el-icon>
+                添加题目
+              </el-button>
               <el-button type="primary" @click="loadData()">
                 <el-icon class="el-icon--left">
                   <Refresh />
@@ -53,8 +54,9 @@
           <el-form-item>
             <el-select v-model="searchParams.tags" multiple filterable clearable placeholder="题目标签" style="width: 300px;"
               @change="loadData">
-              <el-option v-for="tag in tagList" :key="tag.id" :label="tag.name" :value="tag.id">
-                  <el-tag v-show="tagVisible" type="info" :color="tag.color">
+              <el-option v-for="tag in tagList" :key="tag.name" 
+              :label="tag.name" :value="tag.id">
+                  <el-tag type="info" :color="tag.color">
                   <span class="tag-text">{{ tag.name }} </span>
                   </el-tag>
               </el-option>
@@ -116,10 +118,10 @@
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="发布时间" width="120px" />
-        <el-table-column prop="userVO" label="出题人" width="160px">
+        <el-table-column prop="publisherName" label="出题人" width="160px">
           <template #default="scope">
-            <router-link class="rlink" :to="'/user/' + scope.row.userVO.id">
-              {{ scope.row.userVO.userName }}
+            <router-link class="rlink" :to="'/user/' + scope.row.publisherId">
+              {{ scope.row.publisherName }}
             </router-link>
           </template>
         </el-table-column>
@@ -131,7 +133,7 @@
 
 <script setup lang="ts">
 import { reactive,ref,onMounted } from 'vue';
-import { listProblemVOByPage, createProblem } from '../../api/problem';
+import { listProblemVOByPage } from '../../api/problem';
 import type { ProblemQueryRequest, ProblemVO } from '../../api/problem/types';
 import { ElMessage } from 'element-plus';
 import { getAllTags, type Tag } from '../../api/tag';
@@ -151,7 +153,7 @@ const problems = ref<ProblemVO[]>([])
 const total = ref(0);
 const current = ref(1);
 const pageSize = ref(12);
-const tagVisible = ref(true);
+const tagVisible = ref(false);
 const finished = ref(false);
 const tagList = ref<Tag[]>([]);
 const searchParams = reactive<ProblemQueryRequest>({
@@ -229,19 +231,13 @@ async function loadTags() {
     ElMessage.error('failed to load tags')
   }
 }
-const addProblem = async () => {
-  const res1 = await createProblem(userStore.user.userId);
-  if (res1.code === 200) {
-    ElMessage.success('success to create problem' + res1.data)
-    router.push('/problem/edit/' + res1.data);
-  } else {  
-    ElMessage.error('failed to create problem')
-  }
+const addProblem =  () => {
+  router.push('/problem/add');
 };
 onMounted(() => {
   // 刷新页面后标签的可见性不变
   if (userStore.tagVisible !== null) {
-    tagVisible.value = userStore.tagVisible === true;
+    tagVisible.value = userStore.tagVisible === false;
   }
   loadTags();
   const query = route.query;

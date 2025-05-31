@@ -1,6 +1,6 @@
 <template>
     <el-menu mode="horizontal" :default-active="selectedKeys" router="true">
-        <img src="@/assets/cf-icon.png" class="icon">
+        <!-- <img src="@/assets/cf-icon.png" class="icon"> -->
         <el-menu-item index="/">
             <el-icon>
                 <Lollipop />

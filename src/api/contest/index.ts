@@ -1,6 +1,6 @@
 import instance from "../../axios/request";
 import type { PageRequest, RegisterDTO,ContestSubmissionListDTO, 
-  ContestSubmitDTO,ContestProblemsUpdateRequest,ContestBaseUpdateRequest } from "./types";
+  ContestSubmitDTO,ContestProblemsUpdateRequest,ContestBaseUpdateRequest,ContestAddRequest } from "./types";
 
 
 
@@ -20,13 +20,18 @@ export const getContest = (id : string) => {
     }
   });
 }
-// export const addContest = (data: PageRequest) => {
-//   return instance({
-//     url: "/contest/list/page/vo",
-//     method: "post",
-//     data: data
-//   });
-// }
+/**
+ * ContestAddRequest
+ * @param data 
+ * @returns 
+ */
+export const addContest = (data: ContestAddRequest) => {
+  return instance({
+    url: "/contest/add",
+    method: "post",
+    data: data
+  });
+}
 
 export const registerContest = (data: RegisterDTO) => {
   return instance({

@@ -129,7 +129,7 @@
                      || submissionInfo?.submissionResult.statusDescription === 'System Error'" -->
                 <CaseDisplay  v-if="submissionInfo" 
                 :judgeResults="submissionInfo?.submissionResult?.judgeCaseResults || []" />
-                <!-- <v-md-preview :text="submissionInfo?.submissionResult?.compileErrorMessage" /> -->
+                <v-md-preview :text="submissionInfo?.submissionResult?.compileErrorMessage" />
             </el-card>
         </el-col>
     </el-row>
@@ -166,7 +166,8 @@ async function loadSubmission() {
         console.info(res.data)
         ElMessage.success('success to load submission')
         
-        if (submissionInfo.value?.submissionResult.statusDescription === 'Pending' ||
+        if (submissionInfo.value?.submissionResult.statusDescription === 'Submitted'||
+        submissionInfo.value?.submissionResult.statusDescription === 'Pending' ||
           submissionInfo.value?.submissionResult.statusDescription === 'Compiling' 
           || submissionInfo.value?.submissionResult.statusDescription === 'Judging') {
             setTimeout(() => {

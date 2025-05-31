@@ -6,19 +6,18 @@
         <template #header>
           <div class="card-header" style="height: 35px;">
             <p class="title">
-              <span style="vertical-align: -3px;">#{{ problemEditReq.id }}、</span>
 
-              <el-input size="large" v-model="problemEditReq.title"
-               placeholder="请输入题目标题"  class="custom-font-input" style="width: 200px;" />
+              <el-input size="large" v-model="problemAddReq.title"
+               placeholder="请输入题目标题" style="width: 200px;" />
 
-              <el-switch v-model="problemEditReq.isPublic" 
+              <el-switch v-model="problemAddReq.isPublic" 
               style="margin-left: 10px;" size="large" active-text="公开"
                 inactive-text="隐藏" />
             </p>
           </div>
         </template>
         <v-md-editor height="600px" left-toolbar="undo redo clear | h bold italic strikethrough quote | ul ol table hr 
-          | link image code" :editable="true" v-model="problemEditReq.content">
+          | link image code" :editable="true" v-model="problemAddReq.content">
         </v-md-editor>
       </el-card>
     </el-col>
@@ -27,15 +26,15 @@
       <el-card class="box-card" shadow="hover">
         <el-descriptions direction="vertical" :column="1" border>
           <el-descriptions-item label="时间限制">
-            <el-input v-model="problemEditReq.judgeConfig.timeLimit" style="width: 80px;" /> ms
+            <el-input v-model="problemAddReq.judgeConfig.timeLimit" style="width: 80px;" /> ms
           </el-descriptions-item>
           <el-descriptions-item label="空间限制">
-            <el-input v-model="problemEditReq.judgeConfig.memoryLimit" style="width: 80px;" /> MB
+            <el-input v-model="problemAddReq.judgeConfig.memoryLimit" style="width: 80px;" /> MB
           </el-descriptions-item>
 
           <el-descriptions-item label="题目标签">
 
-            <el-select filterable multiple v-model="problemEditReq.tags">
+            <el-select filterable multiple v-model="problemAddReq.tags">
               <el-option class="tag-text" v-for="tag in tags" 
               :key="tag.id" :label="tag.name" :value="tag.id">
                 <el-tag :color="tag.color">
@@ -53,7 +52,7 @@
             </el-button> -->
           </el-descriptions-item>
           <el-descriptions-item label="难度评级">
-            <el-select v-model="problemEditReq.level" placeholder="难度评级" style="width: 150px;">
+            <el-select v-model="problemAddReq.level" placeholder="难度评级" style="width: 150px;">
               <el-option v-for="item in levels" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
           </el-descriptions-item>
@@ -78,35 +77,28 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../../store/user'
-import type { ProblemEditRequest,ProblemVO } from '../../api/problem/types'
-import { getProblemById, editProblem } from '../../api/problem/index'
+import type { ProblemAddRequest} from '../../api/problem/types'
+import { addProblem } from '../../api/problem/index'
 import type { Tag } from '../../api/tag/index'
 import { getAllTags } from '../../api/tag/index'
 import { ElMessage } from 'element-plus'
-import type { UploadInstance } from 'element-plus'
 
-const uploadRef = ref<UploadInstance>()
-const submitUpload = () => {
-  uploadRef.value!.submit()
-}
 const userStore = useUserStore()
 const router = useRouter()
 const route = useRoute()
-const problemEditReq = reactive<ProblemEditRequest>({
-  id: "",
+
+const problemAddReq = reactive<ProblemAddRequest>({
   title: "",
   content: "",
   tags: [],
   level: 0,
   judgeConfig: {
-    memoryLimit: 128, // 128MB,
+    memoryLimit: 128, 
     timeLimit: 1000,
   },
   isPublic: false,
-  userId: userStore.user.userId
+  publisherId: userStore.user.userId
 })
-const oldProblem = ref<ProblemVO>()
-const pid = ref('')
 const tags = ref<Tag[]>([])
 const levels = [
   {
@@ -135,12 +127,10 @@ const levels = [
   },
 ]
 const submit = async () => {
-  // 将problemEditReq.tags（可能为标签对象数组）转换为id数组
 
-  const res = await editProblem(problemEditReq);
+  const res = await addProblem(problemAddReq);
   if (res.code == 200) {
     ElMessage.success("提交成功");
-    // load_problem()
     router.push('/problems');
   } else {
     ElMessage.error("提交失败" + res.message);
@@ -155,32 +145,13 @@ const load_tags = async () => {
     ElMessage.error("加载标签失败");
   }
 }
-const load_problem = async () => {
-  const res = await getProblemById(pid.value);
-  if (res.code == 200) {
-    problemEditReq.id = res.data.id
-    problemEditReq.title = res.data.title;
-    problemEditReq.content = res.data.content;
-    problemEditReq.tags = res.data.tags.map(tag => tag.id);
-    problemEditReq.level = res.data.level;
-    problemEditReq.judgeConfig = res.data.judgeConfig;
-    problemEditReq.isPublic = res.data.isPublic
-  }
-}
+
 onMounted(() => {
-  pid.value = route.params.id as string;
-  load_problem();
   load_tags();
 })
 </script>
 
 <style scoped>
-.custom-font-input >>> .el-input__inner {
-  color: black;
-  font-size: 25px !important;
-  font-weight: 500 !important;
-  line-height: 1.5 !important; /* 可选：调整行高 */
-}
 .box-card {
   margin: 10px;
   text-align: left;

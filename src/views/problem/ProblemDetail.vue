@@ -5,10 +5,10 @@
       <el-tab-pane label="题目" name="problemInfo">
         <template #label>
           <el-icon style="margin: 4px;">
-              <Document />
-            </el-icon>
-            题目详情
-          </template>
+            <Document />
+          </el-icon>
+          题目详情
+        </template>
         <el-row style="margin: auto;max-width: 1500px; min-width: 600px;">
           <el-col :xs="30" :sm="30" :md="18">
             <el-card class="box-card" shadow="hover">
@@ -16,14 +16,13 @@
                 <div class="card-header" style="height: 25px;">
                   <p class="title">
                     #{{ problemData?.id }}、{{ problemData?.title }}
-                    <!-- <el-icon id="hidden" v-if="!problemInfo.isPublic">
-            <Hide />
-          </el-icon> -->
+                    <el-icon id="hidden" v-if="!problemData?.isPublic">
+                      <Hide />
+                    </el-icon>
                   </p>
                 </div>
               </template>
-              <!-- <v-md-preview :text="problemData?.content"/> -->
-              <VMdViewer :text="problemData?.content"></VMdViewer>
+              <v-md-preview :text="problemData?.content" />
             </el-card>
           </el-col>
           <el-col :xs="24" :sm="24" :md="6">
@@ -59,9 +58,9 @@
                   </el-button>
                 </el-descriptions-item>
                 <el-descriptions-item label="出题人">
-                  <!-- <router-link class="rlink" :to="'/user/' + problemInfo.publisherUid">
-          {{ problemInfo.publisher }}
-        </router-link> -->
+                  <router-link class="rlink" :to="'/user/' + problemData?.publisherId">
+                    {{ problemData?.publisherName }}
+                  </router-link>
                 </el-descriptions-item>
                 <el-descriptions-item label="发布时间"> {{ problemData?.createTime }} </el-descriptions-item>
               </el-descriptions>
@@ -70,8 +69,8 @@
         </el-row>
       </el-tab-pane>
       <el-tab-pane label="提交" name="submit">
-      <template #label>
-        <el-icon style="margin: 4px;">
+        <template #label>
+          <el-icon style="margin: 4px;">
             <Upload />
           </el-icon>
           提交代码
@@ -84,7 +83,7 @@
             </el-select>
           </div>
           <el-divider />
-            <monacoEditor :value="code" @update:value="code = $event" />
+          <monacoEditor :value="code" @update:value="code = $event" />
           <el-divider />
 
           <div style="text-align: center;">
@@ -97,6 +96,62 @@
           </div>
         </div>
       </el-tab-pane>
+      <el-tab-pane label="题目管理" name="problemEdit" v-if="userStore.user.userRole >= 1">
+        <template #label>
+          <el-icon style="margin: 4px;">
+            <SetUp />
+          </el-icon>
+          题目管理
+        </template>
+        <ProblemEdit />
+      </el-tab-pane>
+      <el-tab-pane label="样例管理" name="TestCaseManage">
+        <template #label>
+          <el-icon style="margin: 4px;">
+            <Files />
+          </el-icon>
+          样例管理
+        </template>
+        <el-upload ref="uploadRef" class="upload-demo" :header="getAuthHeaders"
+          action="http://127.0.0.1:8080/api/problem/uploadCase" :auto-upload="false" multiple>
+          <template #trigger>
+            <el-button type="primary">select file</el-button>
+          </template>
+
+          <el-button class="ml-3" type="success" @click="handleSubmitUpload">
+            upload to server
+          </el-button>
+
+          <template #tip>
+            <div class="el-upload__tip">
+              jpg/png files with a size less than 500kb
+            </div>
+          </template>
+
+        </el-upload>
+      </el-tab-pane>
+
+
+
+      <el-tab-pane label="数据统计" name="statistic">
+        <template #label>
+          <el-icon style="margin: 4px;">
+            <Histogram />
+          </el-icon>
+          数据统计
+        </template>
+        <ProblemStatistic />
+      </el-tab-pane>
+
+      <!-- <el-tab-pane label="题解评论" name="solution">
+        <template #label>
+          <el-icon style="margin: 4px;">
+            <ChatLineSquare />
+          </el-icon>
+          题解评论
+        </template>
+        <ProblemSolution />
+      </el-tab-pane> -->
     </el-tabs>
   </div>
 
@@ -105,22 +160,31 @@
 </template>
 
 <script setup lang="ts">
-import { getProblemById } from '../../api/problem';
+import { getProblemById, uploadFiles } from '../../api/problem';
 import type { ProblemVO } from '../../api/problem/types';
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router';
-import VMdViewer from '../../components/VMdViewer.vue';
 import { addSubmission } from '../../api/submission';
 import { ElMessage } from 'element-plus';
 import router from '../../router';
 import { useUserStore } from '../../store/user';
-const problemData = ref<ProblemVO | null>(null);
+import ProblemEdit from './problemEdit.vue';
+import type { UploadInstance } from 'element-plus'
+import instance from '../../axios/request';
+import ProblemStatistic from './ProblemStatistic.vue';
+import ProblemSolution from './ProblemSolution.vue';
+
+const problemData = ref<ProblemVO>();
 const code = ref('')
 const activeTab = ref('problemInfo');
-const currentProblemId = ref(0)
+const currentProblemId = ref('')
 const langList = ref(['cpp', 'python', 'java'])
 const submitLang = ref()
 const route = useRoute()
+const userStore = useUserStore()
+
+const selectedFiles = ref<File[]>([]);
+
 const levels = [
   {
     label: '暂未评级',
@@ -148,20 +212,46 @@ const levels = [
   },
 
 ]
+const getAuthHeaders = computed(() => {
+  return {
+    'Authorization': `Bearer ${userStore.token}`
+  };
+});
+
+const handleHttpRequest = (options: any) => {
+
+};
+
+// 手动触发上传
+const submitUpload = () => {
+  uploadRef.value!.submit();
+};
+
+// 处理上传结果
+const handleSuccess = (response: any) => {
+  ElMessage.success('上传成功');
+  console.log('上传成功:', response);
+};
+
+const handleError = (error: any) => {
+  ElMessage.error('上传失败');
+  console.error('上传失败:', error);
+};
+
 
 async function getProblemInfo() {
-  const pid = route.params.id
-  currentProblemId.value = Number(pid)
+  const pid = route.params.id as string
+  currentProblemId.value = pid
   const res = await getProblemById(pid)
   if (res.code === 200) {
+    ElMessage.success('题目获取成功')
     problemData.value = res.data
   } else {
-    console.log(res.message)
+    ElMessage.error('题目获取失败')
   }
 
 }
-const userStore = useUserStore()
-const submit = async () => { 
+const submit = async () => {
   const res = await addSubmission({
     userId: userStore.user.userId,
     problemId: currentProblemId.value,
@@ -235,7 +325,7 @@ onMounted(() => {
 
 .title {
   margin: 0;
-  font-size: 25px;
+  font-size: 30px;
 }
 
 .el-tag {

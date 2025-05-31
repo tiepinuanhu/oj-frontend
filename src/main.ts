@@ -5,6 +5,21 @@ import ElementPlus from 'element-plus'
 import router from './router'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import VChart from 'vue-echarts';
+
+// 引入 ECharts 核心模块
+import * as echarts from 'echarts/core';
+// 引入需要的图表类型和组件
+import { BarChart, LineChart } from 'echarts/charts';
+import { TitleComponent, TooltipComponent, GridComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+
+// 注册 ECharts 组件
+echarts.use(
+  [TitleComponent, TooltipComponent, GridComponent, BarChart, LineChart, CanvasRenderer]
+);
+
+
 
 // markdown预览器
 import VMdEditor from '@kangc/v-md-editor/lib/codemirror-editor';
@@ -92,6 +107,6 @@ app.use(ElementPlus)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
 }
-
+app.component('VChart', VChart);
 
 app.mount('#app')

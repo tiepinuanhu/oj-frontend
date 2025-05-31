@@ -41,6 +41,24 @@ export const routes = [
     },
   },
   {
+    path: "/problem/edit/:id",
+    name: "ProblemEdit",
+    component: () => import("@/views/problem/ProblemEdit.vue"),
+    props: true,
+    meta: {
+      hiddenInMenu: true,
+    },
+  },
+  {
+    path: "/problem/add",
+    name: "ProblemAdd",
+    component: () => import("@/views/problem/ProblemAdd.vue"),
+    props: true,
+    meta: {
+      hiddenInMenu: true,
+    },
+  },
+  {
     path: "/submission",
     name: "SubmissionList",
     component: () => import("@/views/submission/SubmissionList.vue"),
@@ -60,6 +78,12 @@ export const routes = [
     meta: {
       hiddenInMenu: true,
     },
+  },
+  {
+    path: "/contest/add",
+    name: "ContestAdd",
+    component: () => import("@/views/contest/ContestAdd.vue"),
+    props: true,
   },
   {
     path: "/contest/submission/:id",

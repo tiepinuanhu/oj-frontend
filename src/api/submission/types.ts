@@ -1,5 +1,5 @@
 export interface SubmissionAddRequest {
-    userId:  number;
+    userId:  string;
     problemId?: string; // 可选字段（对应 Java 中可能为 null 的 Long）
     sourceCode?: string;
     language?: string;
@@ -50,8 +50,21 @@ export interface PageRequest {
     sortOrder?: string;
 }
 export interface SubmissionQueryDTO extends PageRequest {
-    problemId?: number;
-    userId?: number;
+    problemId?: string;
+    userId?: string;
     language?: string;
-    JudgeResult?: string;
+    judgeResult?: string;
+}
+// 评测结果分布项
+export interface ResultDistributionItem {
+  status: string; // 状态（如"Compile Error"、"Accepted"）
+  count: number;  // 数量
+}
+
+// 数据主体
+export interface ProblemStatisticsVO {
+  problemId: string;              // 题目ID（注意：后端返回为字符串类型）
+  submittedCount: number;         // 总提交次数
+  resultDistributions: ResultDistributionItem[]; // 结果分布数组
+  timeCount: number[]
 }

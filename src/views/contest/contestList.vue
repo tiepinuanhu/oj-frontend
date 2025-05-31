@@ -10,17 +10,14 @@
                     </el-pagination>
                     <el-button-group>
                         <span>
-                            <el-popconfirm v-if="userStore.user.userRole >= 1" confirm-button-text="确认"
-                                cancel-button-text="取消" title="确认添加比赛?" @confirm="addContest">
-                                <template #reference>
-                                    <el-button type="success">
-                                        <el-icon class="el-icon--left">
-                                            <Plus />
-                                        </el-icon>
-                                        添加比赛
-                                    </el-button>
-                                </template>
-                            </el-popconfirm>
+                            <el-button v-if="userStore.user.userRole >= 1"
+                                 @click="addContest"
+                                type="success">
+                                <el-icon class="el-icon--left">
+                                    <Plus />
+                                </el-icon>
+                                添加比赛
+                            </el-button>
                             <el-button type="primary" @click="load_contestList">
                                 <el-icon class="el-icon--left">
                                     <Refresh />
@@ -100,6 +97,7 @@ import { getContestList } from '../../api/contest';
 import { ElMessage } from 'element-plus';
 import { pa } from 'element-plus/es/locales.mjs';
 import { useUserStore } from '../../store/user';
+import router from '../../router';
 
 const userStore = useUserStore()
 
@@ -138,7 +136,7 @@ const handleCurrentChange = (val: number) => {
     load_contestList();
 }
 const addContest = () => {
-
+    router.push('/contest/add')
 }
 onMounted(() => {
     load_contestList();

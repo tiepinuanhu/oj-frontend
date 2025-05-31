@@ -119,6 +119,13 @@ export interface ContestBaseUpdateRequest {
   contestId: string;
   title: string; 
   description: string;
+  duration: number;
+  isPublic:  boolean
+  hostId: string;
+}
+export interface ContestAddRequest {
+  title: string; 
+  description: string;
   startTime: string;
   duration: number;
   isPublic:  number

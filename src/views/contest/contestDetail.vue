@@ -92,26 +92,24 @@
               </template>
 
               <el-row>
-                <!-- <el-col :xs="24" :sm="24" :md="15" style="margin-bottom: 20px;">
+                <el-col :xs="24" :sm="24" :md="15" style="margin-bottom: 20px;">
                   <v-md-editor height="580px"
                     left-toolbar="undo redo clear | h bold italic strikethrough quote 
                     | ul ol table hr | link image code"
-                    style="padding-right: 100px;" v-model="contestUpd?.description">
+                    style="padding-right: 100px;" v-model="contestUpd.description">
                   </v-md-editor>
-                </el-col> -->
+                </el-col>
                 <el-col :xs="24" :sm="24" :md="9" style="padding-left: 30px;">
                   <el-form>
-                    <el-form-item label="比赛标题">
+                    <el-form-item style="width: 250px;" label="比赛标题">
                       <el-input v-model="contestUpd.title"  />
                     </el-form-item>
-                    <el-form-item label="开始时间">
-                        <el-date-picker v-model="contestUpd.startTime"  
-                        format="YYYY-MM-DD HH:mm:ss"
-                        type="datetime" value-format="YYYY-MM-DD HH:mm:ss" />
-                    </el-form-item>
                     <el-form-item label="持续时间" >
-                        <el-input v-model="contestUpd.duration"/> 
+                      <span>
+                         <el-input style="width: 60px;" v-model="contestUpd.duration"/> 
                       mins
+                      </span>
+                       
                     </el-form-item>
                     <el-form-item label="是否公开">
                       <el-switch v-model="contestUpd.isPublic" size="large" active-text="公开"
@@ -120,24 +118,6 @@
                     </el-form-item>
                     <el-form-item>
                       <el-button type="danger" @click="updateContest" >更新比赛</el-button>
-                      <!-- <el-button type="primary" 
-                        @click="this.contestUpd = JSON.parse(JSON.stringify(this.contestInfo));">重新设置</el-button>
-                      <el-popconfirm confirm-button-text="确认" cancel-button-text="取消" title="确认重测该场比赛所有提交?"
-                        @confirm="reJudgeContest">
-                        <template #reference>
-                          <el-button type="warning" >
-                            重测比赛
-                          </el-button>
-                        </template>
-                      </el-popconfirm> -->
-                      <!-- <el-popconfirm confirm-button-text="确认" cancel-button-text="取消" title="确认结束比赛?(结束后无法再修改比赛)"
-                        @confirm="closeContest">
-                        <template #reference>
-                          <el-button type="danger" >
-                            结束比赛
-                          </el-button>
-                        </template>
-                      </el-popconfirm> -->
                     </el-form-item>
                   </el-form>
                 </el-col>
@@ -183,12 +163,11 @@ const contestUpd = ref<ContestBaseUpdateRequest>({
   contestId: '',
   title: '',
   description: '',
-  startTime: new Date(),
   duration: 0,
   isPublic: 0,
   hostId: '',
 });
-const activeName = ref('problemList');
+const activeName = ref('main');
 const percentage = ref(0);
 // 当前用户是否可以加入比赛，是否可以查看比赛的题目、提交等
 const joinAuth = ref(false);
@@ -232,16 +211,6 @@ const frushPercentage = () => {
     return
   }
 }
-const switchTab = (tab : any) => {
-    // let url = location.pathname;
-    // if (tab !== 'main')
-    //   url += ('?tab=' + tab);
-    // history.state.current = url;
-    // history.replaceState(history.state, null, url);
-    // if (needUpdate.value.includes(tab)) {
-    //   nextTick(() => { this.$refs[tab].all(); });
-    // }
-}
 let timer: ReturnType<typeof setInterval> | null = null;
 const load_contest = async () => {
   const res = await getContest(cid.value);
@@ -256,6 +225,7 @@ const load_contest = async () => {
       isPublic: res.data.isPublic || 0,
       hostId: res.data.hostId || '',
     };
+    console.log("❗❗❗❗❗❗❗" + contestUpd.value.isPublic)
     // 每分钟刷新下一次进度条
     frushPercentage();
     if (contestInfo.value.status == 1) {
@@ -303,6 +273,7 @@ const regContest = async () => {
     ElMessage.error('报名失败');
   }
   load_contest()
+  load_auth()
 }
 /**
  * 管理员更新题目基本信息

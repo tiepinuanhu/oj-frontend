@@ -21,7 +21,7 @@ export interface ProblemQueryRequest extends PageRequest {
     id?: string;
     title?: string;
     tags?: Tag[];
-    userId?: number;
+    userId?: string;
     level?: number;
 }
 export interface JudgeConfig {
@@ -36,9 +36,11 @@ export interface ProblemVO {
     level?: number;
     submittedNum?: number;
     acceptedNum?: number;
-    userVO?: UserVO;
+    publisherName: string;
+    publisherId?: string;
     judgeConfig?: JudgeConfig;
     createTime?: Date;
+    isPublic?:boolean
 }
 export interface ProblemEditRequest {
     id:string
@@ -48,5 +50,15 @@ export interface ProblemEditRequest {
   level: number;
   judgeConfig: JudgeConfig; // 裁判配置对象
   userId: string; // Java 的 Long 对应 TypeScript 的 number
-  isPublic:number
+  isPublic:boolean
+}
+
+export interface ProblemAddRequest {
+  title: string;
+  content: string;
+  tags: number[];
+  level: number;
+  judgeConfig: JudgeConfig; 
+  publisherId: string
+  isPublic:boolean
 }
