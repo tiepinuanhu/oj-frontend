@@ -112,23 +112,22 @@
           </el-icon>
           样例管理
         </template>
-        <el-upload ref="uploadRef" class="upload-demo" :header="getAuthHeaders"
-          action="http://127.0.0.1:8080/api/problem/uploadCase" :auto-upload="false" multiple>
-          <template #trigger>
-            <el-button type="primary">select file</el-button>
-          </template>
+         <el-upload
+        ref="uploadRef"
+        class="upload-demo"
+        multiple
+        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+        :auto-upload="false"
+      >
+        <template #trigger>
+          <el-button type="primary">select file</el-button>
+        </template>
 
-          <el-button class="ml-3" type="success" @click="handleSubmitUpload">
-            upload to server
-          </el-button>
+        <el-button class="ml-3" type="success" @click="submitUpload">
+          upload to server
+        </el-button>
 
-          <template #tip>
-            <div class="el-upload__tip">
-              jpg/png files with a size less than 500kb
-            </div>
-          </template>
-
-        </el-upload>
+      </el-upload>
       </el-tab-pane>
 
 
@@ -222,10 +221,6 @@ const handleHttpRequest = (options: any) => {
 
 };
 
-// 手动触发上传
-const submitUpload = () => {
-  uploadRef.value!.submit();
-};
 
 // 处理上传结果
 const handleSuccess = (response: any) => {
@@ -265,7 +260,11 @@ const submit = async () => {
     ElMessage.error('提交失败')
   }
 }
+const uploadRef = ref<UploadInstance>()
 
+const submitUpload = () => {
+  uploadRef.value!.submit()
+}
 onMounted(() => {
   getProblemInfo()
 }

@@ -101,7 +101,6 @@ const load_data = async () => {
         update_chart(resultDistributions.value)
     option2.series[0].data = timeList
 
-        ElMessage.success("❗📍🤣🛴✖😊💕💕🏍😍");
     } else {
         ElMessage.error("..................................");
     }

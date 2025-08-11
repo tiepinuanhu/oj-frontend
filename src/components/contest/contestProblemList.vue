@@ -49,11 +49,9 @@ const finished = ref(false)
 const userStore = useUserStore()
 
 const load_problemList = async () => {
-  // ElMessage.info('获取题目ing')
 
   const res = await getProblemsInContest(cid.value, userStore.user.userId)
   if (res.code === 200) {
-    // ElMessage.success('获取题目成功')
     problemList.value = res.data
     finished.value = true
   } else {
