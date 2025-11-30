@@ -193,7 +193,7 @@ async function loadData() {
     pageSize: pageSize.value
   });
   if (res.code === 200) {
-    // ElMessage.success('success to load data')
+    ElMessage.success('success to load problems')
 
     problems.value = res.data.records
     total.value = Number(res.data.total);
