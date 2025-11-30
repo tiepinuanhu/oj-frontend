@@ -70,7 +70,7 @@
 
       <!-- 😍😍😍😍数据表格😍😍😍😍 -->
       <el-table :data="problems" height="535px" :header-cell-style="{ textAlign: 'center' }"
-       :cell-style="cellStyle" v-loading="!finished">
+       :cell-style="cellStyle" >
         <el-table-column prop="id" label="#" width="100px" />
         <el-table-column prop="title" width="auto" label="标题">
           <template #header>
