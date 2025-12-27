@@ -7,7 +7,7 @@ export const routes = [
   {
     path: "/",
     name: "hello",
-    component: () => import("@/components/HelloWorld.vue"),
+    component: () => import("@/views/HelloWorld.vue"),
   },
   {
     path: "/problems",
@@ -29,6 +29,15 @@ export const routes = [
     component: () => import("@/views/user/Login.vue"),
     meta: {
       needLogin: false,
+    },
+  },
+  {
+    path: "/user/:id",
+    name: "UserDetail",
+    component: () => import("@/views/user/UserDetail.vue"),
+    props: true,
+    meta: {
+      hiddenInMenu: true,
     },
   },
   {

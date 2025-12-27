@@ -76,31 +76,31 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="SubmissionResult" label="评测状态" width="160px">
+        <el-table-column prop="statusDescription" label="评测状态" width="160px">
           <template #default="scope">
             <span >
-              {{ scope.row.submissionResult.statusDescription }}
+              {{ scope.row.statusDescription }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="submissionResult" label="分数" width="80px">
+        <el-table-column prop="score" label="分数" width="80px">
           <template #default="scope">
             <span style="cursor: pointer;" @click="lookSubmissionDetail(scope)"> 
-              {{ scope.row.submissionResult.score }}
+              {{ scope.row.score }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="submissionResult" label="总用时" width="100px">
+        <el-table-column prop="totalTime" label="总用时" width="100px">
           <template #default="scope">
-            <span> {{ scope.row.submissionResult.totalTime }} ms</span>
+            <span> {{ scope.row.totalTime }} ms</span>
           </template>
         </el-table-column>
-        <el-table-column prop="submissionResult" label="内存" width="100px">
+        <el-table-column prop="memoryUsed" label="内存" width="100px">
           <template #default="scope">
-            <span> {{ scope.row.submissionResult.memoryUsed / 1024}} KB </span>
+            <span> {{ scope.row.memoryUsed / 1024}} KB </span>
           </template>
         </el-table-column>
-        <el-table-column prop="submissionResult" label="语言 / 代码长度" width="150px">
+        <el-table-column label="语言 / 代码长度" width="150px">
           <template #default="scope">
             <span>{{ scope.row.language }} / {{ scope.row.codeLength }} B </span>
           </template>
@@ -123,14 +123,14 @@ import { useUserStore } from '../../store/user';
 import { RouterLink, useRouter } from 'vue-router';
 import qs from 'qs';
 import { useRoute } from 'vue-router';
-import type { SubmissionQueryDTO, SubmissionVO } from '../../api/submission/types';
+import type { SubmissionQueryDTO, ListSubmissionVO } from '../../api/submission/types';
 import { getSubmissions } from '../../api/submission';
 import { resColor, scoreColor } from '../../assets/common'
 
 /**
  * 组件数据
  */
-const submissionList = ref<SubmissionVO[]>([])
+const submissionList = ref<ListSubmissionVO[]>([])
 const langList = [
   { id: 1, des: 'cpp' },
   { id: 2, des: 'python' },
@@ -221,12 +221,12 @@ const cellStyle = ({ row, columnIndex } : any) => {
   style['textAlign'] = 'center';
   if (columnIndex === 3) {
     style['font-weight'] = '500';
-    style['color'] = resColor[row.submissionResult.statusDescription];
+    style['color'] = resColor[row.submissionStatus];
   }
   if (columnIndex === 4) {
     style['font-weight'] = '500';
     console.info(row)
-    style['color'] = scoreColor[Math.floor(row.submissionResult.score / 10)];
+    style['color'] = scoreColor[Math.floor(row.score / 10)];
   }
   return style;
 }

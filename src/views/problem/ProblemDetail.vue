@@ -83,7 +83,7 @@
             </el-select>
           </div>
           <el-divider />
-          <monacoEditor :value="code" @update:value="code = $event" />
+          <monacoEditor v-if="activeTab === 'submit'" :value="code" @update:value="code = $event" />
           <el-divider />
 
           <div style="text-align: center;">

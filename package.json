@@ -18,6 +18,7 @@
     "echarts": "^5.6.0",
     "element-plus": "^2.9.7",
     "highlight.js": "^11.11.1",
+    "katex": "^0.16.27",
     "md-editor-v3": "^5.5.0",
     "monaco-editor": "^0.52.2",
     "pinia-plugin-persistedstate": "^4.2.0",

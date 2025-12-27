@@ -43,7 +43,7 @@
         <el-avatar :size="35" :src="userStore.user.userAvatar"/>
         <span style="padding-left: 8px;"> {{ userStore.user.userName }} </span>
       </template>
-      <el-menu-item >
+      <el-menu-item :index="'/user/' + userStore.user.userId">
         <el-icon>
           <UserFilled />
         </el-icon>

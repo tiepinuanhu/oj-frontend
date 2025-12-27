@@ -19,3 +19,10 @@ export const userRegister = (data: UserRegisterRequest) => {
     data: data
   });
 };
+
+export const getUserById = (id: string) => {
+  return instance({
+    url: `/user/get?id=${id}`,
+    method: "get"
+  });
+};

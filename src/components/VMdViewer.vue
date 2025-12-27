@@ -8,7 +8,6 @@
 <script>
 import { ElMessage } from 'element-plus';
 
-
 export default {
 data() {
     return {
@@ -19,6 +18,9 @@ methods: {
     handleCopyCodeSuccess(code) {
         ElMessage.success("复制成功");
     },
+},
+mounted() {
+    console.log('VMdViewer mounted');
 },
 };
 </script>

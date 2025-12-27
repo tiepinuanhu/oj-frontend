@@ -39,6 +39,21 @@ export interface SubmissionVO {
     language: string; // 编程语言
     createTime: Date; // 时间类型
   }
+export interface ListSubmissionVO {
+    id: number;
+    userId: number;
+    userAccount: string; // 新增字段
+    problemId: number;
+    problemTitle: string; // 新增字段
+    sourceCode: string;
+     totalTime: number;
+     score: number;
+    memoryUsed: number;
+    codeLength: number;
+    statusDescription: string; // 状态描述（如 "waiting"）
+    language: string; // 编程语言
+    createTime: Date; // 时间类型
+  }
 export interface PageRequest {
     // 当前页号，默认值为 1
     current?: number;

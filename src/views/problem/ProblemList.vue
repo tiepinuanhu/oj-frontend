@@ -70,7 +70,7 @@
 
       <!-- 😍😍😍😍数据表格😍😍😍😍 -->
       <el-table :data="problems" height="535px" :header-cell-style="{ textAlign: 'center' }"
-       :cell-style="cellStyle" >
+       :cell-style="cellStyle" v-loading="loading">
         <el-table-column prop="id" label="#" width="100px" />
         <el-table-column prop="title" width="auto" label="标题">
           <template #header>
@@ -155,6 +155,7 @@ const current = ref(1);
 const pageSize = ref(12);
 const tagVisible = ref(false);
 const finished = ref(false);
+const loading = ref(false);
 const tagList = ref<Tag[]>([]);
 const searchParams = reactive<ProblemQueryRequest>({
   id:  undefined,
@@ -169,6 +170,7 @@ const searchParams = reactive<ProblemQueryRequest>({
  * URL路径参数展示页号，修改url可以实现换页
  */
 async function loadData() {
+  loading.value = true;
   finished.value = false;
   
   const param: Record<string, any> = {};
@@ -193,7 +195,7 @@ async function loadData() {
     pageSize: pageSize.value
   });
   if (res.code === 200) {
-    ElMessage.success('success to load problems')
+    // ElMessage.success('success to load problems')
 
     problems.value = res.data.records
     total.value = Number(res.data.total);
@@ -201,6 +203,7 @@ async function loadData() {
   } else {
     ElMessage.warning('failed to load data')
   }
+  loading.value = false;
 }
 
 

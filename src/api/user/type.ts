@@ -4,9 +4,8 @@ export interface UserVO {
     userName: string;
     userAvatar: string;
     userProfile: string;
-    token: string;
-    userRole: string;
-    createTime: Date;
+    userRole: number;
+    createTime: string;
 }
 export interface LoginParams {
     userAccount: string;
