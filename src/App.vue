@@ -69,8 +69,8 @@ li,
   z-index: 20;
 }
 
-.el-loading-mask {
-  z-index: 10;
+.el-main {
+  min-height: 100vh;
 }
 
 body {
