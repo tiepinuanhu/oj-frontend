@@ -179,10 +179,10 @@ async function loadData() {
   } else {
     filter.value.userId = undefined;
   }
-  if (filter.value.userId !== null && filter.value.userId !== undefined) param.level = filter.value.userId;
-  if (filter.value.problemId !== null && filter.value.problemId !== undefined) param.level = filter.value.problemId;
-  if (filter.value.language !== null && filter.value.language !== undefined) param.level = filter.value.language;
-  if (filter.value.JudgeResult !== null && filter.value.JudgeResult !== undefined) param.level = filter.value.JudgeResult;
+  if (filter.value.userId !== null && filter.value.userId !== undefined) param.userId = filter.value.userId;
+  if (filter.value.problemId !== null && filter.value.problemId !== undefined) param.problemId = filter.value.problemId;
+  if (filter.value.language !== null && filter.value.language !== undefined) param.language = filter.value.language;
+  if (filter.value.JudgeResult !== null && filter.value.JudgeResult !== undefined) param.judgeResult = filter.value.JudgeResult;
 
   param.current = current.value;
 
@@ -253,42 +253,42 @@ const mySub =  () => {
   }
   loadData();
 }
-const levels = [
-  {
-    index: 0,
-    label: '暂未评级',
-    color: '#BFBFBF'
-  },
-  {
-    index: 1,
-    label: '入门',
-    color: '#FE4C61'
-  },
-  {
-    index: 2,
-    label: '普及',
-    color: '#FFC116'
-  },
-  {
-    index: 3,
-    label: '提高',
-    color: '#52C41A'
-  },
-  {
-    index: 4,
-    label: '省选',
-    color: '#3498DB'
-  },
-  {
-    index: 5,
-    label: 'NOI / NOI+',
-    color: '#0E1D69'
-  },
-  {
-    index: 6,
-    label: '不限难度',
-  },
-]
+// const levels = [
+//   {
+//     index: 0,
+//     label: '暂未评级',
+//     color: '#BFBFBF'
+//   },
+//   {
+//     index: 1,
+//     label: '入门',
+//     color: '#FE4C61'
+//   },
+//   {
+//     index: 2,
+//     label: '普及',
+//     color: '#FFC116'
+//   },
+//   {
+//     index: 3,
+//     label: '提高',
+//     color: '#52C41A'
+//   },
+//   {
+//     index: 4,
+//     label: '省选',
+//     color: '#3498DB'
+//   },
+//   {
+//     index: 5,
+//     label: 'NOI / NOI+',
+//     color: '#0E1D69'
+//   },
+//   {
+//     index: 6,
+//     label: '不限难度',
+//   },
+// ]
 </script>
 
 <style scoped>
