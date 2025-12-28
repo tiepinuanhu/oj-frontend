@@ -221,7 +221,7 @@ const cellStyle = ({ row, columnIndex } : any) => {
   style['textAlign'] = 'center';
   if (columnIndex === 3) {
     style['font-weight'] = '500';
-    style['color'] = resColor[row.submissionStatus];
+    style['color'] = resColor[row.statusDescription];
   }
   if (columnIndex === 4) {
     style['font-weight'] = '500';
