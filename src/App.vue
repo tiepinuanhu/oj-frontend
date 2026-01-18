@@ -27,7 +27,7 @@ onMounted(() => {
     <el-footer id="footer">
       <div style="font-weight: 600; color:#74767a">
         Super OJ powered by
-        <a href="https://github.com/tiepinunahu/oj-backend1" target="_blank" class="rainbow">Super OJ</a>
+        <a href="https://github.com/tiepinunahu/oj-backend" target="_blank" class="rainbow">Super OJ</a>
         Developed by
         <span style="color: black;">xinchao wang</span>
       </div>
