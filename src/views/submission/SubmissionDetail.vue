@@ -153,6 +153,7 @@ const submissionId = ref(0)
 const mounted = ref(false)
 const judged = ref(false)
 const hasTaken = ref(false)
+const submittedSince = ref<number | null>(null)
 const route = useRoute()
 const userStore = useUserStore()
 
@@ -166,10 +167,18 @@ async function loadSubmission() {
         console.info(res.data)
         ElMessage.success('success to load submission')
         
-        if (submissionInfo.value?.submissionResult.statusDescription === 'Submitted'||
-        submissionInfo.value?.submissionResult.statusDescription === 'Pending' ||
-          submissionInfo.value?.submissionResult.statusDescription === 'Compiling' 
-          || submissionInfo.value?.submissionResult.statusDescription === 'Judging') {
+        const status = submissionInfo.value?.submissionResult.statusDescription
+        if (status === 'Submitted' || status === 'Pending' || status === 'Compiling' || status === 'Judging') {
+            if (status === 'Submitted') {
+                if (submittedSince.value === null) {
+                    submittedSince.value = Date.now()
+                } else if (Date.now() - submittedSince.value > 10000) {
+                    ElMessage.warning('提交状态超时，停止轮询')
+                    return
+                }
+            } else {
+                submittedSince.value = null
+            }
             setTimeout(() => {
               loadSubmission();
             }, 1000)

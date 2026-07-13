@@ -87,9 +87,11 @@ VMdPreview.use(githubTheme, {
 
 const app = createApp(App)
 
-import createKatexPlugin from '@kangc/v-md-editor/lib/plugins/katex/cdn';
-VMdEditor.use(createKatexPlugin({ cdnLink: 'https://unpkg.com/katex@0.16.9/dist/' })).use(createCopyCodePlugin());
-VMdPreview.use(createKatexPlugin({ cdnLink: 'https://unpkg.com/katex@0.16.9/dist/' })).use(createCopyCodePlugin());
+// 使用本地 katex（cdn 版不会自动注入脚本，window.katex 为空时公式会原样显示）
+import createKatexPlugin from '@kangc/v-md-editor/lib/plugins/katex/npm';
+import 'katex/dist/katex.min.css';
+VMdEditor.use(createKatexPlugin()).use(createCopyCodePlugin());
+VMdPreview.use(createKatexPlugin()).use(createCopyCodePlugin());
 
 
 app.use(VMdPreview)
