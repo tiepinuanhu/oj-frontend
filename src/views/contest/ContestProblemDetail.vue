@@ -18,7 +18,7 @@
                   </p>
                 </div>
               </template>
-              <v-md-preview :text="problemData?.content"></v-md-preview>
+              <VMdViewer :text="problemData?.content" />
             </el-card>
           </el-col>
           <el-col :xs="24" :sm="24" :md="6">

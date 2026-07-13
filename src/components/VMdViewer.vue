@@ -1,37 +1,32 @@
 <template>
-<v-md-preview
+  <v-md-preview
     :text="text"
     @copy-code-success="handleCopyCodeSuccess"
-></v-md-preview>
+  />
 </template>
 
-<script>
+<script setup lang="ts">
 import { ElMessage } from 'element-plus';
 
-export default {
-data() {
-    return {
-    text: "",
-    };
-},
-methods: {
-    handleCopyCodeSuccess(code) {
-        ElMessage.success("复制成功");
-    },
-},
-mounted() {
-    console.log('VMdViewer mounted');
-},
+withDefaults(
+  defineProps<{
+    text?: string;
+  }>(),
+  {
+    text: '',
+  }
+);
+
+const handleCopyCodeSuccess = () => {
+  ElMessage.success('复制成功');
 };
 </script>
 
 <style scoped>
-/* 针对预览区域 */
 .v-md-editor__preview {
-  font-size: 16px; /* 调整为合适大小，如 14px、16px */
+  font-size: 16px;
 }
 
-/* 针对编辑区域（若编辑时字体也大） */
 .v-md-editor__editor.cm-s-github {
   font-size: 16px;
 }

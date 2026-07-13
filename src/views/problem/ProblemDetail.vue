@@ -22,7 +22,7 @@
                   </p>
                 </div>
               </template>
-              <v-md-preview :text="problemData?.content" />
+              <VMdViewer :text="problemData?.content" />
             </el-card>
           </el-col>
           <el-col :xs="24" :sm="24" :md="6">
@@ -172,6 +172,7 @@ import type { UploadInstance } from 'element-plus'
 import instance from '../../axios/request';
 import ProblemStatistic from './ProblemStatistic.vue';
 import ProblemSolution from './ProblemSolution.vue';
+import VMdViewer from '../../components/VMdViewer.vue';
 
 const problemData = ref<ProblemVO>();
 const code = ref('')
