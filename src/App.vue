@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Header from '@/components/Header.vue';
 import 'element-plus/es/components/message/style/css' // ElMessage
+import 'element-plus/es/components/message-box/style/css' // ElMessageBox
 import { onMounted } from 'vue';
 import { useUserStore } from './store/user';
 import { ElMessage } from 'element-plus';

@@ -105,29 +105,17 @@
         </template>
         <ProblemEdit />
       </el-tab-pane>
-      <el-tab-pane label="样例管理" name="TestCaseManage">
+      <el-tab-pane label="样例管理" name="TestCaseManage" v-if="userStore.user.userRole >= 1">
         <template #label>
           <el-icon style="margin: 4px;">
             <Files />
           </el-icon>
           样例管理
         </template>
-         <el-upload
-        ref="uploadRef"
-        class="upload-demo"
-        multiple
-        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-        :auto-upload="false"
-      >
-        <template #trigger>
-          <el-button type="primary">select file</el-button>
-        </template>
-
-        <el-button class="ml-3" type="success" @click="submitUpload">
-          upload to server
-        </el-button>
-
-      </el-upload>
+        <TestCaseManage
+          :problem-id="currentProblemId"
+          :active="activeTab === 'TestCaseManage'"
+        />
       </el-tab-pane>
 
 
@@ -159,19 +147,17 @@
 </template>
 
 <script setup lang="ts">
-import { getProblemById, uploadFiles } from '../../api/problem';
+import { getProblemById } from '../../api/problem';
 import type { ProblemVO } from '../../api/problem/types';
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router';
 import { addSubmission } from '../../api/submission';
 import { ElMessage } from 'element-plus';
 import router from '../../router';
 import { useUserStore } from '../../store/user';
 import ProblemEdit from './problemEdit.vue';
-import type { UploadInstance } from 'element-plus'
-import instance from '../../axios/request';
 import ProblemStatistic from './ProblemStatistic.vue';
-import ProblemSolution from './ProblemSolution.vue';
+import TestCaseManage from './TestCaseManage.vue';
 import VMdViewer from '../../components/VMdViewer.vue';
 
 const problemData = ref<ProblemVO>();
@@ -182,8 +168,6 @@ const langList = ref(['cpp', 'python', 'java'])
 const submitLang = ref()
 const route = useRoute()
 const userStore = useUserStore()
-
-const selectedFiles = ref<File[]>([]);
 
 const levels = [
   {
@@ -212,28 +196,6 @@ const levels = [
   },
 
 ]
-const getAuthHeaders = computed(() => {
-  return {
-    'Authorization': `Bearer ${userStore.token}`
-  };
-});
-
-const handleHttpRequest = (options: any) => {
-
-};
-
-
-// 处理上传结果
-const handleSuccess = (response: any) => {
-  ElMessage.success('上传成功');
-  console.log('上传成功:', response);
-};
-
-const handleError = (error: any) => {
-  ElMessage.error('上传失败');
-  console.error('上传失败:', error);
-};
-
 
 async function getProblemInfo() {
   const pid = route.params.id as string
@@ -260,11 +222,6 @@ const submit = async () => {
   } else {
     ElMessage.error('提交失败')
   }
-}
-const uploadRef = ref<UploadInstance>()
-
-const submitUpload = () => {
-  uploadRef.value!.submit()
 }
 onMounted(() => {
   getProblemInfo()

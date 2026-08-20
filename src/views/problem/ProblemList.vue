@@ -38,22 +38,47 @@
 
 
       <!-- 😍😍😍😍😍筛选搜索😍😍😍😍😍😍 -->
-      <div style="display: inline-flex;">
+      <div style="display: inline-flex; align-items: flex-start;">
         <el-form :inline="true" :model="searchParams" >
           <el-form-item>
-            <el-input v-model="searchParams.title" type="text" placeholder="题目标题或内容" 
-            style="width: 280px;" @keyup.enter="loadData" />
+            <el-input
+              v-model="searchParams.id"
+              clearable
+              placeholder="题目编号"
+              style="width: 120px;"
+              :disabled="!!searchText?.trim()"
+              @keyup.enter="handleSearch"
+              @clear="handleSearch"
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-input
+              v-model="searchText"
+              clearable
+              placeholder="关键词搜索（标题 / 题面）"
+              style="width: 280px;"
+              :disabled="!!searchParams.id"
+              @keyup.enter="handleSearch"
+              @clear="handleSearch"
+            >
+              <template #prefix>
+                <el-icon><Search /></el-icon>
+              </template>
+            </el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="handleSearch">搜索</el-button>
           </el-form-item>
           <el-form-item>
             <el-select v-model="searchParams.level" placeholder="难度评级" 
-            style="width: 120px;" @change="loadData">
+            style="width: 120px;" :disabled="!!searchText?.trim()" @change="loadData">
               <el-option v-for="it in levels" :key="it.index" :label="it.label" 
               :value="it.index" />
             </el-select>
           </el-form-item>
           <el-form-item>
             <el-select v-model="searchParams.tags" multiple filterable clearable placeholder="题目标签" style="width: 300px;"
-              @change="loadData">
+              :disabled="!!searchText?.trim()" @change="loadData">
               <el-option v-for="tag in tagList" :key="tag.name" 
               :label="tag.name" :value="tag.id">
                   <el-tag type="info" :color="tag.color">
@@ -132,10 +157,11 @@
 </template>
 
 <script setup lang="ts">
-import { reactive,ref,onMounted } from 'vue';
-import { listProblemVOByPage } from '../../api/problem';
+import { reactive, ref, onMounted } from 'vue';
+import { listProblemVOByPage, searchProblemByEs } from '../../api/problem';
 import type { ProblemQueryRequest, ProblemVO } from '../../api/problem/types';
 import { ElMessage } from 'element-plus';
+import { Search } from '@element-plus/icons-vue';
 import { getAllTags, type Tag } from '../../api/tag';
 import { useUserStore } from '../../store/user';
 import { RouterLink } from 'vue-router';
@@ -157,6 +183,8 @@ const tagVisible = ref(false);
 const finished = ref(false);
 const loading = ref(false);
 const tagList = ref<Tag[]>([]);
+/** ES 关键词（有值时走全文检索，忽略难度/标签筛选） */
+const searchText = ref('');
 const searchParams = reactive<ProblemQueryRequest>({
   id:  undefined,
   title: undefined,
@@ -166,48 +194,86 @@ const searchParams = reactive<ProblemQueryRequest>({
 });
 
 /**
- * 请求后端题目数据
+ * 请求后端题目数据：有关键词走 ES，否则走原列表筛选
  * URL路径参数展示页号，修改url可以实现换页
  */
 async function loadData() {
   loading.value = true;
   finished.value = false;
-  
+
+  // 有题目编号时走精确 id 筛选，不再走 ES 关键词
+  const problemId = normalizeProblemId(searchParams.id);
+  searchParams.id = problemId;
+  const keyword = problemId ? '' : searchText.value?.trim();
+  if (problemId) {
+    searchText.value = '';
+  }
+
   const param: Record<string, any> = {};
-  if (searchParams.title) param.title = searchParams.title;
-  if (searchParams.level !== null && searchParams.level !== undefined) param.level = searchParams.level;
-  if (searchParams.tags && searchParams.tags.length > 0) param.tags = searchParams.tags;
+  if (problemId) param.id = problemId;
+  if (keyword) param.searchText = keyword;
+  if (!keyword && searchParams.level !== null && searchParams.level !== undefined) {
+    param.level = searchParams.level;
+  }
+  if (!keyword && searchParams.tags && searchParams.tags.length > 0) {
+    param.tags = searchParams.tags;
+  }
   param.current = current.value;
 
-  const qsStr = qs.stringify(param); // 使用 qs 库拼接查询参数
+  const qsStr = qs.stringify(param);
   const url = `${route.path}?${qsStr}`;
   history.replaceState(history.state, null, url);
 
+  try {
+    const res = keyword
+      ? await searchProblemByEs({
+          searchText: keyword,
+          userId: userStore.user.userId,
+          current: current.value,
+          pageSize: pageSize.value,
+        })
+      : await listProblemVOByPage({
+          ...searchParams,
+          id: problemId,
+          current: current.value,
+          pageSize: pageSize.value,
+        });
 
-
-
-  /**
-   * 💕💕💕...是展开语法
-   */
-  const res = await listProblemVOByPage({
-    ...searchParams,
-    current: current.value,
-    pageSize: pageSize.value
-  });
-  if (res.code === 200) {
-    // ElMessage.success('success to load problems')
-
-    problems.value = res.data.records
-    total.value = Number(res.data.total);
-    finished.value = true;
-  } else {
-    ElMessage.warning('failed to load data')
+    if (res.code === 200) {
+      problems.value = res.data.records;
+      total.value = Number(res.data.total);
+      finished.value = true;
+    } else {
+      ElMessage.warning(res.message || 'failed to load data');
+    }
+  } catch (e) {
+    ElMessage.error('加载题目失败');
+  } finally {
+    loading.value = false;
   }
-  loading.value = false;
 }
 
+/** 题目编号：空串转 undefined，非数字丢弃 */
+function normalizeProblemId(id: string | undefined): string | undefined {
+  if (id === null || id === undefined) return undefined;
+  const trimmed = String(id).trim();
+  if (!trimmed) return undefined;
+  if (!/^\d+$/.test(trimmed)) {
+    ElMessage.warning('题目编号须为数字');
+    return undefined;
+  }
+  return trimmed;
+}
+
+/** 关键词搜索：回到第一页再拉取 */
+const handleSearch = () => {
+  current.value = 1;
+  searchParams.current = 1;
+  loadData();
+};
 
 const handleCurrentChange = (val: number) => {
+  current.value = val;
   searchParams.current = val;
   loadData();
 }
@@ -219,10 +285,13 @@ const cellStyle = (columnIndex ) => {
   return { textAlign: columnIndex === 1 ? 'left' : 'center' };
 };
 const clear = () => {
+  searchText.value = '';
   searchParams.id = undefined;
   searchParams.title = undefined;
   searchParams.tags = undefined;
   searchParams.level = undefined;
+  current.value = 1;
+  searchParams.current = 1;
   loadData();
 };
 async function loadTags() {
@@ -247,6 +316,15 @@ onMounted(() => {
   if (query.current) {
     current.value = parseInt(query.current as string);
     searchParams.current = current.value;
+  }
+  if (query.id) {
+    searchParams.id = String(query.id);
+  }
+  if (query.searchText) {
+    searchText.value = query.searchText as string;
+  }
+  if (query.level !== undefined) {
+    searchParams.level = Number(query.level);
   }
   loadData();
 });

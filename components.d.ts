@@ -11,6 +11,7 @@ declare module 'vue' {
     ContestProblemList: typeof import('./src/components/contest/contestProblemList.vue')['default']
     ContestRank: typeof import('./src/components/contest/contestRank.vue')['default']
     ContestSubmissionList: typeof import('./src/components/contest/contestSubmissionList.vue')['default']
+    ElAlert: typeof import('element-plus/es')['ElAlert']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElButtonGroup: typeof import('element-plus/es')['ElButtonGroup']

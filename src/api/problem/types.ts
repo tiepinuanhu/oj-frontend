@@ -24,6 +24,14 @@ export interface ProblemQueryRequest extends PageRequest {
     userId?: string;
     level?: number;
 }
+
+/** 基于 Elasticsearch 的题目全文检索请求 */
+export interface ProblemEsQueryRequest extends PageRequest {
+    /** 检索关键词（匹配 title + 题面） */
+    searchText: string;
+    /** 当前用户 id（权限过滤） */
+    userId?: string;
+}
 export interface JudgeConfig {
     memoryLimit?: number;
     timeLimit?: number;
@@ -61,4 +69,41 @@ export interface ProblemAddRequest {
   judgeConfig: JudgeConfig; 
   publisherId: string
   isPublic:boolean
+}
+
+export interface UploadStandardRequest {
+  problemId: number;
+  sourceCode: string;
+}
+
+export interface StandardSolutionVO {
+  problemId: number;
+  language: string;
+  sourceCode?: string;
+}
+
+export interface UploadStandardVO {
+  problemId: number;
+  language: string;
+  saved: boolean;
+  outsRegenerated?: boolean;
+  regenerateResult?: GenerateCasesVO;
+}
+
+export interface GenerateCaseItemVO {
+  index: number;
+  ok: boolean;
+  output?: string;
+  timeCost?: number;
+  memoryUsed?: number;
+  status?: string;
+  error?: string;
+}
+
+export interface GenerateCasesVO {
+  problemId: number;
+  persisted: boolean;
+  successCount: number;
+  failCount: number;
+  cases: GenerateCaseItemVO[];
 }
