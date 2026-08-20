@@ -20,7 +20,10 @@
 
 - **首页**：日榜等信息展示
 - **用户**：注册、登录、个人主页
-- **题库**：题目列表（难度 / 标签筛选）、详情（Markdown + 公式）、在线编程提交、新增 / 编辑题目、统计
+- **题库**：
+  - 列表：题目编号精确查询、难度 / 标签筛选；关键词走 Elasticsearch 全文检索（标题 / 题面）
+  - 详情：Markdown + 公式预览、在线编程提交、新增 / 编辑题目、统计
+  - **样例管理**（管理员）：上传 C++ 标程、上传 `.in` / zip 并由后端按标程生成 `.out`
 - **提交**：提交列表与详情、判题状态轮询、用例展示
 - **比赛**：比赛列表 / 详情、报名、赛题作答、比赛提交与榜单、赛题管理
 
@@ -29,6 +32,7 @@
 - Node.js 18+（建议 LTS）
 - pnpm 8+（或 npm / yarn）
 - 已启动的 [oj-backend](https://github.com/tiepinuanhu/oj-backend)（默认 `http://localhost:8080/api`）
+- 关键词检索需后端 Elasticsearch 可用
 
 ## 快速开始
 
@@ -72,14 +76,24 @@ pnpm preview
 | `/` | 首页 |
 | `/user/login`、`/user/register` | 登录 / 注册 |
 | `/user/:id` | 用户主页 |
-| `/problems` | 题库列表 |
-| `/problem/:id` | 题目详情与提交 |
+| `/problems` | 题库列表（编号 / 关键词 / 难度 / 标签） |
+| `/problem/:id` | 题目详情与提交；管理员可见「样例管理」Tab |
 | `/problem/add`、`/problem/edit/:id` | 新增 / 编辑题目 |
 | `/submission`、`/submission/:id` | 提交列表 / 详情 |
 | `/contest`、`/contest/:id` | 比赛列表 / 详情 |
 | `/contest/add` | 创建比赛 |
 | `/contest/:cid/problem/:idx` | 比赛题目 |
 | `/contest/submission/:id` | 比赛提交详情 |
+
+## 题库与样例管理说明
+
+- **编号搜索**与**关键词搜索**互斥：有题目编号时走精确 id 筛选；有关键词时调用 `/problem/search`（ES），并暂时忽略难度 / 标签筛选
+- **样例管理**（`TestCaseManage.vue`，题目详情内 Tab）：
+  1. 保存 C++ 标程 → `uploadStandard` / `getStandard`
+  2. 上传多个 `.in` 或包含 `.in` 的 zip → `generateCasesByFiles`，后端用标程生成并覆盖样例
+- 标程与样例生成接口超时较长（约 120s），请保证 go-judge 正常
+
+相关 API 封装见 `src/api/problem/`。
 
 ## 项目结构
 
@@ -91,7 +105,7 @@ oj-frontend/
 └── src/
     ├── api/              # 按模块划分的接口封装
     │   ├── user/
-    │   ├── problem/
+    │   ├── problem/      # 含 ES 检索、标程与样例接口
     │   ├── submission/
     │   ├── contest/
     │   ├── tag/
@@ -102,7 +116,7 @@ oj-frontend/
     ├── store/            # Pinia（用户登录态等）
     ├── views/            # 页面
     │   ├── user/
-    │   ├── problem/
+    │   ├── problem/      # 含 TestCaseManage 样例管理
     │   ├── submission/
     │   └── contest/
     ├── App.vue
@@ -114,10 +128,11 @@ oj-frontend/
 - 登录成功后 JWT 写入 Pinia（并持久化）
 - 请求拦截器自动附加 `Authorization: Bearer <token>`
 - 响应头若带回新 token，会更新本地存储
+- 样例管理 Tab 仅对管理员角色展示（`userRole >= 1`）
 
 ## 与后端联调
 
-1. 按 oj-backend README 启动 MySQL、Redis、RabbitMQ、go-judge 与后端服务
+1. 按 oj-backend README 启动 MySQL、Redis、RabbitMQ、Elasticsearch、go-judge 与后端服务
 2. 确认 `baseURL` 指向正确的后端
 3. 启动本项目 `pnpm dev` 即可联调
 
